@@ -16,6 +16,7 @@ const withApiErrorHandler: IWithErrorHandler = (handler) => async (req, res) => 
       return res.status(400).json({ message: error });
     }
 
+
     if (Array.isArray(error)) {
       return res.status(400).json({ message: error.join(',') });
     }
