@@ -50,4 +50,12 @@ export default class UserService extends DatabaseConnection {
       jwt: Password.signToken<ISerializedUser>(user.serialize()),
     };
   }
+
+  static async getUser(username: string): Promise<ISerializedUser> {
+    const user = await this.userRepository.findOne({ username });
+
+    if (user) return user.serialize();
+
+    return Promise.reject(['User not found']);
+  }
 }

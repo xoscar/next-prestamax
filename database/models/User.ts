@@ -24,8 +24,9 @@ export default class User {
   role: string;
 
   constructor(rawUser: IRawUser) {
-    const { name, username, role, password, token } = rawUser || {};
+    const { id, name, username, role, password, token } = rawUser || {};
 
+    this.id = id;
     this.name = name;
     this.username = username;
     this.role = role;
@@ -59,6 +60,7 @@ export default class User {
 
   serialize(): ISerializedUser {
     return {
+      id: this.id,
       username: this.username,
       name: this.name,
       role: this.role,

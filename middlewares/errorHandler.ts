@@ -12,6 +12,7 @@ const withApiErrorHandler: IWithErrorHandler = (handler) => async (req, res) => 
   try {
     await handler(req, res);
   } catch (error) {
+    console.log('>>>', error);
     if (typeof error === 'string') {
       return res.status(400).json({ message: error });
     }

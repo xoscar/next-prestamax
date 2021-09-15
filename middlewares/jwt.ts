@@ -1,19 +1,17 @@
 import expressJwt from 'express-jwt';
 import { promisify } from 'util';
-import getConfig from 'next/config';
 import { Request, Response } from 'express';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiResponse } from 'next';
+import { AuthorizedNextApiRequest } from '../database/interfaces/ICommon';
 
-const { serverRuntimeConfig } = getConfig();
+const { JWT_SECRET } = process.env;
 
-const middleware = expressJwt({ secret: serverRuntimeConfig.secret, algorithms: ['HS256'] }).unless(
-  {
-    path: [''],
-  },
-);
+const middleware = expressJwt({ secret: JWT_SECRET as string, algorithms: ['HS256'] }).unless({
+  path: [''],
+});
 
 interface IHandlerFunction {
-  (req: NextApiRequest, res: NextApiResponse): Promise<void>;
+  (req: AuthorizedNextApiRequest, res: NextApiResponse): Promise<void>;
 }
 
 interface IWithJWTMIddleware {
@@ -23,7 +21,7 @@ interface IWithJWTMIddleware {
 const withJWTMiddleware: IWithJWTMIddleware = (handler) => async (req, res) => {
   await promisify(middleware)(req as unknown as Request, res as unknown as Response);
 
-  handler(req, res);
+  await handler(req, res);
 };
 
 export default withJWTMiddleware;
