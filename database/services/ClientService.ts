@@ -3,6 +3,7 @@ import { ObjectID } from 'mongodb';
 import { IRawClient, ISerializedClient } from '../interfaces/IClient';
 import Client from '../models/Client';
 import DatabaseConnection from '../utils/DatabaseConnection';
+import LoanService from './LoanService';
 
 export type ILoginUserResponse = ISerializedClient & {
   jwt: string;
@@ -71,6 +72,11 @@ export default class ClientService extends DatabaseConnection {
   }
 
   static async deleteClient(userId: TypeObjectID, clientId: string): Promise<void> {
-    await this.clientRepository.deleteOne({ client_id: clientId, userId: new ObjectID(userId) });
+    const client = await this.getClient(userId, clientId);
+    await LoanService.deleteClientLoans(userId, client.id as TypeObjectID);
+    await this.clientRepository.deleteOne({
+      id: new ObjectID(clientId),
+      userId: new ObjectID(userId),
+    });
   }
 }

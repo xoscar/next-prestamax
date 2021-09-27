@@ -2,6 +2,7 @@ import { ObjectID } from 'typeorm';
 import { IRawPayment, ISerializedPayment } from './IPayment';
 
 export interface IRawLoan {
+  _id?: ObjectID;
   id?: ObjectID;
   client_id?: ObjectID;
   user_id: ObjectID;

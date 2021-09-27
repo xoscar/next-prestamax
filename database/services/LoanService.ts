@@ -18,7 +18,7 @@ export default class LoanService extends DatabaseConnection {
   static async getLoan(userId: TypeObjectID, loanId: TypeObjectID): Promise<Loan> {
     const loan = await this.loanRepository.findOne({
       user_id: new ObjectID(userId),
-      id: new ObjectID(loanId),
+      _id: new ObjectID(loanId),
     });
 
     return loan || Promise.reject(['Loan not found.']);
@@ -44,40 +44,37 @@ export default class LoanService extends DatabaseConnection {
     loan.number_id = counter.count;
     loan.setSearch(client);
 
-    counter.count + 1;
+    counter.count = counter.count + 1;
     await this.counterRepository.save(counter);
 
     return this.loanRepository.save(loan);
   }
 
-  static async updateLoan(
-    userId: TypeObjectID,
-    client: Client,
-    loanId: TypeObjectID,
-    values: IRawLoan,
-  ): Promise<Loan> {
+  static async updateLoan(client: Client, loanId: TypeObjectID, values: IRawLoan): Promise<Loan> {
     const errors = Loan.validateData(values, client.id);
 
     if (errors.length) return Promise.reject(errors);
 
-    const parsedLoanId = new ObjectID(loanId);
-    const loan = await this.loanRepository.findOne({ id: parsedLoanId });
+    const loan = await this.getLoan(client.user_id as TypeObjectID, loanId);
 
-    if (!loan) return Promise.reject(['Loan not found']);
-
-    loan.update(userId, values, client);
+    loan.update(values);
 
     await this.loanRepository.save(loan);
 
     return loan;
   }
 
-  static async deleteLoan(
-    userId: TypeObjectID,
-    client: Client,
-    loanId: TypeObjectID,
-  ): Promise<void> {
-    const parsedLoanId = new ObjectID(loanId);
-    await this.loanRepository.deleteOne({ id: parsedLoanId });
+  static async deleteLoan(userId: TypeObjectID, loanId: TypeObjectID): Promise<void> {
+    await this.loanRepository.deleteOne({
+      _id: new ObjectID(loanId),
+      user_id: new ObjectID(userId),
+    });
+  }
+
+  static async deleteClientLoans(userId: TypeObjectID, clientId: TypeObjectID): Promise<void> {
+    await this.loanRepository.deleteMany({
+      user_id: new ObjectID(userId),
+      client_id: new ObjectID(clientId),
+    });
   }
 }

@@ -8,6 +8,9 @@ import isValid from 'date-fns/isValid';
 @Entity('charges')
 export default class Charge {
   @ObjectIdColumn()
+  _id?: ObjectID;
+
+  @ObjectIdColumn()
   id: ObjectID;
 
   @Column('number')
@@ -37,6 +40,7 @@ export default class Charge {
   constructor(rawCharge: IRawCharge) {
     const {
       amount,
+      _id,
       id,
       description,
       created,
@@ -47,11 +51,12 @@ export default class Charge {
       user_id,
     } = rawCharge || {};
 
+    this._id = _id;
     this.id = id;
     this.amount = amount;
     this.created = created;
     this.description = description;
-    this.paid = paid;
+    this.paid = !!paid;
     this.paid_date = paid_date;
     this.expiration_date = expiration_date;
     this.client_id = client_id;
@@ -64,23 +69,22 @@ export default class Charge {
 
   static validateData(clientId: ObjectID, values: IRawCharge): Array<string> {
     const errors = [];
-    if (!isEmpty(values)) errors.push('query', 'Invalid request.');
+    if (isEmpty(values)) errors.push('Invalid request.');
     const { amount, created } = values;
 
-    if (!amount || !validator.isNumeric(`${amount}`))
-      errors.push('amount', 'La cantidad debe ser numerica.');
+    if (!amount || !validator.isNumeric(`${amount}`)) errors.push('La cantidad debe ser numerica.');
     if (!clientId || !validator.isMongoId(`${clientId}`))
-      errors.push('client_id', 'El número de identificación del cliente es invalido.');
-    if (created && isValid(created)) errors.push('created', 'La fecha de creación no es válida.');
+      errors.push('El número de identificación del cliente es invalido.');
+    if (created && isValid(created)) errors.push('La fecha de creación no es válida.');
 
     return errors;
   }
 
   serialize(): ISerializedCharge {
-    const { id, expiration_date, amount, created, description, paid_date, paid } = this;
+    const { _id, expiration_date, amount, created, description, paid_date, paid } = this;
 
     return {
-      id,
+      id: _id,
       expiration_date,
       amount,
       created,

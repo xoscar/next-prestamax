@@ -26,7 +26,8 @@ export default class ClientViewModel {
 
     return Promise.all(
       clientList.map(async (client): Promise<ClientResult> => {
-        const { id: clientId } = client;
+        const { id } = client;
+        const clientId = id as ObjectID;
         const [finishedLoanList, activeLoanList, activeCharges] = await Promise.all([
           LoanService.getLoans({ finished: true, clientId }),
           LoanService.getLoans({ finished: false, clientId }),

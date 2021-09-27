@@ -14,14 +14,18 @@ export type LoanQuery = {
 export default class PaymentService extends DatabaseConnection {
   static loanRepository = getMongoRepository(Loan);
 
+  private static findPayment(loan: Loan, paymentId: TypeObjectID) {
+    return loan.getPayments().find(({ _id }) => paymentId.toString() === _id?.toString());
+  }
+
   static async getPayment(
     userId: TypeObjectID,
     loanId: TypeObjectID,
     paymentId: TypeObjectID,
   ): Promise<Payment> {
-    const { payments } = await LoanService.getLoan(userId, loanId);
+    const loan = await LoanService.getLoan(userId, loanId);
 
-    const payment = payments.find(({ id }) => paymentId === id);
+    const payment = this.findPayment(loan, paymentId);
 
     return payment || Promise.reject(['Payment not found']);
   }
@@ -60,7 +64,7 @@ export default class PaymentService extends DatabaseConnection {
 
     if (!!errors.length) return Promise.reject(errors);
 
-    const payment = loan.payments.find(({ id }) => id === paymentId);
+    const payment = this.findPayment(loan, paymentId);
     const { amount, created } = values;
 
     if (!payment) return Promise.reject(['Payment not found.']);
@@ -68,11 +72,13 @@ export default class PaymentService extends DatabaseConnection {
     payment.amount = amount;
     payment.created = created || payment.created;
 
-    loan.payments = loan.payments.filter(({ id }) => id !== paymentId).concat([payment]);
+    loan.payments = loan.payments
+      .filter(({ _id: id }) => id?.toString() !== paymentId.toString())
+      .concat([payment]);
 
     await this.loanRepository.save(loan);
 
-    return payment;
+    return new Payment(payment);
   }
 
   static async deletePayment(
@@ -82,7 +88,7 @@ export default class PaymentService extends DatabaseConnection {
   ): Promise<void> {
     const loan = await LoanService.getLoan(userId, loanId);
 
-    loan.payments = loan.payments.filter(({ id }) => id !== paymentId);
+    loan.payments = loan.payments.filter(({ _id: id }) => id?.toString() !== paymentId.toString());
 
     await this.loanRepository.save(loan);
   }

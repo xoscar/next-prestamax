@@ -1,11 +1,15 @@
 import { isEmpty } from 'lodash';
 import validator from 'validator';
-import { Column, ObjectID, ObjectIdColumn } from 'typeorm';
+import { Column, ObjectID as TypedObjectID, ObjectIdColumn } from 'typeorm';
+import { ObjectID } from 'mongodb';
 import { IRawPayment, ISerializedPayment } from '../interfaces/IPayment';
 
 export default class Payment {
   @ObjectIdColumn()
-  id?: ObjectID;
+  _id?: TypedObjectID;
+
+  @ObjectIdColumn()
+  id?: TypedObjectID;
 
   @Column('number')
   amount: number;
@@ -16,7 +20,7 @@ export default class Payment {
   constructor(rawPayment: IRawPayment) {
     const { amount, created, _id } = rawPayment || {};
 
-    this.id = _id;
+    this._id = _id || new ObjectID();
     this.amount = amount;
     this.created = created || new Date();
   }
@@ -39,10 +43,10 @@ export default class Payment {
   }
 
   serialize(): ISerializedPayment {
-    const { amount, created, id } = this;
+    const { amount, created, _id } = this;
 
     return {
-      id,
+      id: _id,
       amount,
       created,
     };

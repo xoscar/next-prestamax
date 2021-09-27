@@ -1,5 +1,6 @@
-import { add, addWeeks, differenceInWeeks, endOfWeek, isAfter, isValid } from 'date-fns';
-import { Entity, ObjectID, ObjectIdColumn, Column } from 'typeorm';
+import { addWeeks, differenceInWeeks, endOfWeek, isAfter, isValid } from 'date-fns';
+import { Entity, ObjectID as TypeObjectID, ObjectIdColumn, Column } from 'typeorm';
+import { ObjectID } from 'mongodb';
 import validator from 'validator';
 import { IRawLoan, ISerializedLoan } from '../interfaces/ILoan';
 import { IRawPayment } from '../interfaces/IPayment';
@@ -9,13 +10,16 @@ import Payment from './Payment';
 @Entity('loans')
 export default class Loan {
   @ObjectIdColumn()
-  id?: ObjectID;
+  _id?: TypeObjectID;
+
+  @ObjectIdColumn({ name: 'id' })
+  id?: TypeObjectID;
 
   @Column('string')
-  user_id?: ObjectID;
+  user_id?: TypeObjectID;
 
   @Column('string')
-  client_id?: ObjectID;
+  client_id?: TypeObjectID;
 
   @Column('number')
   number_id: number;
@@ -78,11 +82,13 @@ export default class Loan {
       visible,
       payments = [],
       search,
+      _id,
     } = rawLoan || {};
 
     const expiredDate = addWeeks(endOfWeek(created), weeks);
     const finishedDate = !finished_date && finished ? new Date() : finished_date;
 
+    this._id = _id;
     this.id = id;
     this.client_id = client_id;
     this.user_id = user_id;
@@ -103,20 +109,15 @@ export default class Loan {
     this.search = search;
   }
 
-  update(
-    userId: ObjectID,
-    { amount, weeks, weekly_payment, description, created }: IRawLoan,
-    client: Client,
-  ): void {
-    const expiredDate = addWeeks(endOfWeek(created || this.created), weeks);
-    this.user_id = userId;
+  update({ amount, weeks, weekly_payment, description, created }: IRawLoan): void {
+    const newDate = created || this.created;
+    const expiredDate = addWeeks(endOfWeek(newDate), weeks);
     this.amount = amount;
     this.weekly_payment = weekly_payment;
     this.weeks = weeks;
     this.description = description;
-    this.created = created || this.created;
+    this.created = newDate;
     this.expired_date = expiredDate;
-    this.setSearch(client);
     this.updated = new Date();
     this.finished = this.currentBalance <= 0;
   }
@@ -124,7 +125,7 @@ export default class Loan {
   setSearch(client: Client): void {
     const { name, surname, client_id: clientId } = client;
 
-    this.search = [`${name} ${surname}`, clientId, this.amount, this.weeks, this.number_id];
+    this.search = [`${name} ${surname}`, clientId, this.number_id];
   }
 
   getPayments(): Array<Payment> {
@@ -153,7 +154,7 @@ export default class Loan {
 
   serialize(): ISerializedLoan {
     const {
-      id,
+      _id,
       client_id,
       number_id,
       amount,
@@ -169,7 +170,7 @@ export default class Loan {
     } = this;
 
     return {
-      id,
+      id: _id,
       client_id,
       number_id,
       amount,

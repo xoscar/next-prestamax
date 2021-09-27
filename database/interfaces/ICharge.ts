@@ -1,6 +1,7 @@
 import { ObjectID } from 'typeorm';
 
 export interface IRawCharge {
+  _id?: ObjectID;
   id: ObjectID;
   amount: number;
   description: string;
@@ -13,7 +14,7 @@ export interface IRawCharge {
 }
 
 export interface ISerializedCharge {
-  id: ObjectID;
+  id?: ObjectID;
   amount: number;
   description: string;
   paid: boolean;

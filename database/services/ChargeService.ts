@@ -15,10 +15,10 @@ export default class ChargeService extends DatabaseConnection {
 
   static async getCharge(chargeId: TypeObjectID): Promise<Charge> {
     const charge = await this.chargeRepository.findOne({
-      id: new ObjectID(chargeId),
+      _id: new ObjectID(chargeId),
     });
 
-    return charge || Promise.reject(['Client not found.']);
+    return charge || Promise.reject(['Charge not found.']);
   }
 
   static async getCharges({ paid = true, clientId }: ChargeQuery): Promise<Array<Charge>> {
@@ -31,12 +31,12 @@ export default class ChargeService extends DatabaseConnection {
   static async createCharge(client: Client, values: IRawCharge): Promise<Charge> {
     const errors = Charge.validateData(client.id as TypeObjectID, values);
 
-    if (errors) return Promise.reject(errors);
+    if (errors.length) return Promise.reject(errors);
 
     const charge = new Charge(values);
 
     charge.user_id = new ObjectID(client.user_id);
-    charge.client_id = new ObjectID(client.client_id);
+    charge.client_id = new ObjectID(client.id);
 
     return this.chargeRepository.save(charge);
   }
@@ -48,7 +48,7 @@ export default class ChargeService extends DatabaseConnection {
   ): Promise<Charge> {
     const errors = Charge.validateData(client.id as TypeObjectID, values);
 
-    if (errors) return Promise.reject(errors);
+    if (errors.length) return Promise.reject(errors);
 
     const charge = await this.getCharge(chargeId);
     const { amount, created, description } = values;

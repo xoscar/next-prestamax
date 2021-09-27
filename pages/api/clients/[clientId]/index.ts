@@ -10,7 +10,7 @@ import withJWTMiddleware from '../../../../middlewares/jwt';
 
 const handler = async (
   req: AuthorizedNextApiRequest,
-  res: NextApiResponse<ISerializedClient | Array<ISerializedClient> | { success: boolean }>,
+  res: NextApiResponse<ISerializedClient | Array<ISerializedClient>>,
 ): Promise<void> => {
   switch (req.method) {
     case HttpMethods.GET: {
@@ -38,9 +38,10 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { clientId } = req.query;
+      await ClientService.getClient(id as ObjectID, clientId as string);
       await ClientService.deleteClient(id as ObjectID, clientId as string);
 
-      return res.status(204).json({ success: true });
+      return res.status(204).end();
     }
 
     default: {

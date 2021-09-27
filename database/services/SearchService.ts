@@ -30,7 +30,7 @@ export default class SearchService extends DatabaseConnection {
       termsList: termList.map((term) => ({
         search: {
           $regex: term.toLowerCase(),
-          $options: 'mig',
+          $options: 'i',
         },
       })),
     };
