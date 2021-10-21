@@ -1,13 +1,14 @@
-import { Entity, ObjectID, ObjectIdColumn, Column } from 'typeorm';
+import { ObjectId } from 'mongodb';
+import { Entity, ObjectIdColumn, Column } from 'typeorm';
 import { IRawClient, ISerializedClient } from '../interfaces/IClient';
 
 @Entity('clients')
 export default class Client {
   @ObjectIdColumn()
-  id?: ObjectID;
+  id?: ObjectId;
 
   @Column('string')
-  user_id?: ObjectID;
+  user_id?: ObjectId;
 
   @Column('string')
   client_id: string;

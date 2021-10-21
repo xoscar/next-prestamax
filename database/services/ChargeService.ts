@@ -1,5 +1,5 @@
-import { getMongoRepository, ObjectID as TypeObjectID } from 'typeorm';
-import { ObjectID } from 'mongodb';
+import { getMongoRepository } from 'typeorm';
+import { ObjectId } from 'mongodb';
 import DatabaseConnection from '../utils/DatabaseConnection';
 import Charge from '../models/Charge';
 import Client from '../models/Client';
@@ -7,15 +7,15 @@ import { IRawCharge } from '../interfaces/ICharge';
 
 export type ChargeQuery = {
   paid: boolean;
-  clientId: TypeObjectID;
+  clientId: string;
 };
 
 export default class ChargeService extends DatabaseConnection {
   static chargeRepository = getMongoRepository(Charge);
 
-  static async getCharge(chargeId: TypeObjectID): Promise<Charge> {
+  static async getCharge(chargeId: string): Promise<Charge> {
     const charge = await this.chargeRepository.findOne({
-      _id: new ObjectID(chargeId),
+      _id: new ObjectId(chargeId),
     });
 
     return charge || Promise.reject(['Charge not found.']);
@@ -24,29 +24,25 @@ export default class ChargeService extends DatabaseConnection {
   static async getCharges({ paid = true, clientId }: ChargeQuery): Promise<Array<Charge>> {
     return this.chargeRepository.find({
       paid,
-      client_id: new ObjectID(clientId),
+      client_id: new ObjectId(clientId),
     });
   }
 
   static async createCharge(client: Client, values: IRawCharge): Promise<Charge> {
-    const errors = Charge.validateData(client.id as TypeObjectID, values);
+    const errors = Charge.validateData(client.id as ObjectId, values);
 
     if (errors.length) return Promise.reject(errors);
 
     const charge = new Charge(values);
 
-    charge.user_id = new ObjectID(client.user_id);
-    charge.client_id = new ObjectID(client.id);
+    charge.user_id = new ObjectId(client.user_id);
+    charge.client_id = new ObjectId(client.id);
 
     return this.chargeRepository.save(charge);
   }
 
-  static async updateCharge(
-    client: Client,
-    chargeId: TypeObjectID,
-    values: IRawCharge,
-  ): Promise<Charge> {
-    const errors = Charge.validateData(client.id as TypeObjectID, values);
+  static async updateCharge(client: Client, chargeId: string, values: IRawCharge): Promise<Charge> {
+    const errors = Charge.validateData(client.id as ObjectId, values);
 
     if (errors.length) return Promise.reject(errors);
 
@@ -60,7 +56,7 @@ export default class ChargeService extends DatabaseConnection {
     return this.chargeRepository.save(charge);
   }
 
-  static async payCharge(client: Client, chargeId: TypeObjectID): Promise<Charge> {
+  static async payCharge(client: Client, chargeId: string): Promise<Charge> {
     const charge = await this.getCharge(chargeId);
 
     charge.paid = true;
@@ -69,8 +65,8 @@ export default class ChargeService extends DatabaseConnection {
     return this.chargeRepository.save(charge);
   }
 
-  static async deleteCharge(chargeId: TypeObjectID): Promise<void> {
-    const parsedChargeId = new ObjectID(chargeId);
+  static async deleteCharge(chargeId: string): Promise<void> {
+    const parsedChargeId = new ObjectId(chargeId);
 
     await this.chargeRepository.deleteOne({ id: parsedChargeId });
   }

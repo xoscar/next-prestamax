@@ -16,7 +16,7 @@ const Home: NextPage = () => {
       </Head>
 
       <main>
-        <Title>Presta Max</Title>
+        <Title>PrestaMax</Title>
       </main>
     </div>
   );

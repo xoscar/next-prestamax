@@ -1,5 +1,5 @@
-import { getMongoRepository, ObjectID as TypeObjectID } from 'typeorm';
-import { ObjectID } from 'mongodb';
+import { getMongoRepository } from 'typeorm';
+import { ObjectId } from 'mongodb';
 import Loan from '../models/Loan';
 import DatabaseConnection from '../utils/DatabaseConnection';
 import { IRawLoan } from '../interfaces/ILoan';
@@ -8,17 +8,17 @@ import Client from '../models/Client';
 
 export type LoanQuery = {
   finished: boolean;
-  clientId: TypeObjectID;
+  clientId: string;
 };
 
 export default class LoanService extends DatabaseConnection {
   static loanRepository = getMongoRepository(Loan);
   static counterRepository = getMongoRepository(Counter);
 
-  static async getLoan(userId: TypeObjectID, loanId: TypeObjectID): Promise<Loan> {
+  static async getLoan(userId: string, loanId: string): Promise<Loan> {
     const loan = await this.loanRepository.findOne({
-      user_id: new ObjectID(userId),
-      _id: new ObjectID(loanId),
+      user_id: new ObjectId(userId),
+      _id: new ObjectId(loanId),
     });
 
     return loan || Promise.reject(['Loan not found.']);
@@ -27,7 +27,7 @@ export default class LoanService extends DatabaseConnection {
   static async getLoans({ finished = true, clientId }: LoanQuery): Promise<Array<Loan>> {
     return this.loanRepository.find({
       finished,
-      client_id: new ObjectID(clientId),
+      client_id: new ObjectId(clientId),
     });
   }
 
@@ -39,8 +39,8 @@ export default class LoanService extends DatabaseConnection {
     const counter = (await this.counterRepository.findOne({ name: 'loans' })) || new Counter();
 
     const loan = new Loan(values);
-    loan.client_id = new ObjectID(client.id);
-    loan.user_id = new ObjectID(client.user_id);
+    loan.client_id = new ObjectId(client.id);
+    loan.user_id = new ObjectId(client.user_id);
     loan.number_id = counter.count;
     loan.setSearch(client);
 
@@ -50,12 +50,12 @@ export default class LoanService extends DatabaseConnection {
     return this.loanRepository.save(loan);
   }
 
-  static async updateLoan(client: Client, loanId: TypeObjectID, values: IRawLoan): Promise<Loan> {
+  static async updateLoan(client: Client, loanId: string, values: IRawLoan): Promise<Loan> {
     const errors = Loan.validateData(values, client.id);
 
     if (errors.length) return Promise.reject(errors);
 
-    const loan = await this.getLoan(client.user_id as TypeObjectID, loanId);
+    const loan = await this.getLoan(client.user_id?.toString() as string, loanId);
 
     loan.update(values);
 
@@ -64,17 +64,17 @@ export default class LoanService extends DatabaseConnection {
     return loan;
   }
 
-  static async deleteLoan(userId: TypeObjectID, loanId: TypeObjectID): Promise<void> {
+  static async deleteLoan(userId: string, loanId: string): Promise<void> {
     await this.loanRepository.deleteOne({
-      _id: new ObjectID(loanId),
-      user_id: new ObjectID(userId),
+      _id: new ObjectId(loanId),
+      user_id: new ObjectId(userId),
     });
   }
 
-  static async deleteClientLoans(userId: TypeObjectID, clientId: TypeObjectID): Promise<void> {
+  static async deleteClientLoans(userId: string, clientId: string): Promise<void> {
     await this.loanRepository.deleteMany({
-      user_id: new ObjectID(userId),
-      client_id: new ObjectID(clientId),
+      user_id: new ObjectId(userId),
+      client_id: new ObjectId(clientId),
     });
   }
 }

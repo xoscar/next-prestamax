@@ -1,6 +1,6 @@
 import { flow } from 'lodash';
 import type { NextApiResponse } from 'next';
-import { ObjectID } from 'typeorm';
+import { ObjectId } from 'mongodb';
 import { AuthorizedNextApiRequest } from '../../database/interfaces/ICommon';
 import { ISerializedLoan } from '../../database/interfaces/ILoan';
 import Loan from '../../database/models/Loan';
@@ -18,8 +18,7 @@ const handler = async (
       const {
         payload: { id },
       } = req.user;
-      const userId = id as ObjectID;
-      const loanList = await SearchService.runQuery<Loan>(Loan, userId, req.query);
+      const loanList = await SearchService.runQuery<Loan>(Loan, id as ObjectId, req.query);
 
       return res.status(200).json(loanList.map((loan) => loan.serialize()));
     }

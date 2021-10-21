@@ -1,6 +1,5 @@
 import { flow } from 'lodash';
 import type { NextApiResponse } from 'next';
-import { ObjectID } from 'typeorm';
 import { ISerializedCharge } from '../../../../database/interfaces/ICharge';
 import { AuthorizedNextApiRequest } from '../../../../database/interfaces/ICommon';
 import ChargeService from '../../../../database/services/ChargeService';
@@ -19,10 +18,10 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { clientId, paid } = req.query;
-      const client = await ClientService.getClient(id as ObjectID, clientId as string);
+      const client = await ClientService.getClient(id?.toString() as string, clientId as string);
       const charges = await ChargeService.getCharges({
         paid: paid === 'true',
-        clientId: client.id as ObjectID,
+        clientId: client.id?.toString() as string,
       });
 
       return res.status(200).json(charges.map((charge) => charge.serialize()));
@@ -33,7 +32,7 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { clientId } = req.query;
-      const client = await ClientService.getClient(id as ObjectID, clientId as string);
+      const client = await ClientService.getClient(id?.toString() as string, clientId as string);
       const charge = await ChargeService.createCharge(client, req.body);
 
       return res.status(200).json(charge.serialize());

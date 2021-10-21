@@ -1,16 +1,16 @@
 import { flow } from 'lodash';
 import type { NextApiResponse } from 'next';
-import { ObjectID } from 'typeorm';
 import { ISerializedClient } from '../../../../database/interfaces/IClient';
 import { AuthorizedNextApiRequest } from '../../../../database/interfaces/ICommon';
 import ClientService from '../../../../database/services/ClientService';
+import ClientViewModel, { ClientResult } from '../../../../database/viewModel/ClientViewModel';
 import { HttpMethods } from '../../../../enums/http';
 import withApiErrorHandler from '../../../../middlewares/errorHandler';
 import withJWTMiddleware from '../../../../middlewares/jwt';
 
 const handler = async (
   req: AuthorizedNextApiRequest,
-  res: NextApiResponse<ISerializedClient | Array<ISerializedClient>>,
+  res: NextApiResponse<ISerializedClient | Array<ISerializedClient> | ClientResult>,
 ): Promise<void> => {
   switch (req.method) {
     case HttpMethods.GET: {
@@ -18,9 +18,10 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { clientId } = req.query;
-      const client = await ClientService.getClient(id as ObjectID, clientId as string);
+      const client = await ClientService.getClient(id?.toString() as string, clientId as string);
+      const stats = await ClientViewModel.getStatsForClient(client);
 
-      return res.status(200).json(client.serialize());
+      return res.status(200).json({ ...client.serialize(), stats });
     }
 
     case HttpMethods.PUT: {
@@ -28,7 +29,11 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { clientId } = req.query;
-      const client = await ClientService.updateClient(id as ObjectID, clientId as string, req.body);
+      const client = await ClientService.updateClient(
+        id?.toString() as string,
+        clientId as string,
+        req.body,
+      );
 
       return res.status(200).json(client.serialize());
     }
@@ -38,8 +43,8 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { clientId } = req.query;
-      await ClientService.getClient(id as ObjectID, clientId as string);
-      await ClientService.deleteClient(id as ObjectID, clientId as string);
+      await ClientService.getClient(id?.toString() as string, clientId as string);
+      await ClientService.deleteClient(id?.toString() as string, clientId as string);
 
       return res.status(204).end();
     }

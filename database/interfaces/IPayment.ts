@@ -1,13 +1,13 @@
-import { ObjectID } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 export interface IRawPayment {
-  _id?: ObjectID;
+  _id?: ObjectId;
   amount: number;
   created: Date;
 }
 
 export interface ISerializedPayment {
-  id?: ObjectID;
+  id?: ObjectId;
   amount: number;
   created: Date;
 }

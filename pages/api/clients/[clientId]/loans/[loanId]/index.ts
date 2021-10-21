@@ -1,7 +1,5 @@
 import { flow } from 'lodash';
 import type { NextApiResponse } from 'next';
-import { ObjectID as TypedObjectID } from 'typeorm';
-import { ObjectID } from 'mongodb';
 import { AuthorizedNextApiRequest } from '../../../../../../database/interfaces/ICommon';
 import { ISerializedLoan } from '../../../../../../database/interfaces/ILoan';
 import ClientService from '../../../../../../database/services/ClientService';
@@ -20,7 +18,7 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { loanId } = req.query;
-      const loan = await LoanService.getLoan(id as ObjectID, new ObjectID(loanId));
+      const loan = await LoanService.getLoan(id?.toString() as string, loanId as string);
 
       return res.status(200).json(loan.serialize());
     }
@@ -30,8 +28,8 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { loanId, clientId } = req.query;
-      const client = await ClientService.getClient(id as TypedObjectID, clientId as string);
-      const loan = await LoanService.updateLoan(client, new ObjectID(loanId), req.body);
+      const client = await ClientService.getClient(id?.toString() as string, clientId as string);
+      const loan = await LoanService.updateLoan(client, loanId as string, req.body);
 
       return res.status(200).json(loan.serialize());
     }
@@ -41,8 +39,8 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { clientId, loanId } = req.query;
-      const client = await ClientService.getClient(id as TypedObjectID, clientId as string);
-      await LoanService.deleteLoan(client.user_id as TypedObjectID, new ObjectID(loanId));
+      const client = await ClientService.getClient(id?.toString() as string, clientId as string);
+      await LoanService.deleteLoan(client.user_id?.toString() as string, loanId as string);
 
       return res.status(204).end();
     }

@@ -1,10 +1,11 @@
-import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
+import { ObjectId } from 'mongodb';
+import { Column, Entity, ObjectIdColumn } from 'typeorm';
 import { IRawCounter } from '../interfaces/ICounter';
 
 @Entity('counters')
 export default class Counter {
   @ObjectIdColumn()
-  id?: ObjectID;
+  id?: ObjectId;
 
   @Column('string')
   name: string;

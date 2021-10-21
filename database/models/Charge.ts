@@ -1,17 +1,18 @@
 import isAfter from 'date-fns/isAfter';
+import { ObjectId } from 'mongodb';
 import { isEmpty } from 'lodash';
 import validator from 'validator';
-import { Column, Entity, ObjectID, ObjectIdColumn } from 'typeorm';
+import { Column, Entity, ObjectIdColumn } from 'typeorm';
 import { IRawCharge, ISerializedCharge } from '../interfaces/ICharge';
 import isValid from 'date-fns/isValid';
 
 @Entity('charges')
 export default class Charge {
   @ObjectIdColumn()
-  _id?: ObjectID;
+  _id?: ObjectId;
 
   @ObjectIdColumn()
-  id: ObjectID;
+  id: ObjectId;
 
   @Column('number')
   amount: number;
@@ -32,10 +33,10 @@ export default class Charge {
   expiration_date: Date;
 
   @Column('string')
-  client_id?: ObjectID;
+  client_id?: ObjectId;
 
   @Column('string')
-  user_id?: ObjectID;
+  user_id?: ObjectId;
 
   constructor(rawCharge: IRawCharge) {
     const {
@@ -67,7 +68,7 @@ export default class Charge {
     return isAfter(Date.now(), this.expiration_date) && !this.paid;
   }
 
-  static validateData(clientId: ObjectID, values: IRawCharge): Array<string> {
+  static validateData(clientId: ObjectId, values: IRawCharge): Array<string> {
     const errors = [];
     if (isEmpty(values)) errors.push('Invalid request.');
     const { amount, created } = values;

@@ -4,6 +4,7 @@ import Document, {
   NextScript,
   DocumentContext,
   DocumentInitialProps,
+  Html,
 } from 'next/document';
 import { ReactElement } from 'react';
 import { ServerStyleSheet } from 'styled-components';
@@ -35,13 +36,19 @@ class BaseDocument extends Document {
   render(): ReactElement {
     const { styleTags } = this.props as unknown as IBaseDocumentProps;
     return (
-      <html>
-        <Head>{styleTags}</Head>
-        <body>
+      <Html>
+        <Head>
+          {styleTags}
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+          />
+        </Head>
+        <body style={{ margin: 0 }}>
           <Main />
           <NextScript />
         </body>
-      </html>
+      </Html>
     );
   }
 }

@@ -1,6 +1,6 @@
 import { addWeeks, differenceInWeeks, endOfWeek, isAfter, isValid } from 'date-fns';
-import { Entity, ObjectID as TypeObjectID, ObjectIdColumn, Column } from 'typeorm';
-import { ObjectID } from 'mongodb';
+import { Entity, ObjectIdColumn, Column } from 'typeorm';
+import { ObjectId } from 'mongodb';
 import validator from 'validator';
 import { IRawLoan, ISerializedLoan } from '../interfaces/ILoan';
 import { IRawPayment } from '../interfaces/IPayment';
@@ -10,16 +10,16 @@ import Payment from './Payment';
 @Entity('loans')
 export default class Loan {
   @ObjectIdColumn()
-  _id?: TypeObjectID;
+  _id?: ObjectId;
 
   @ObjectIdColumn({ name: 'id' })
-  id?: TypeObjectID;
+  id?: ObjectId;
 
   @Column('string')
-  user_id?: TypeObjectID;
+  user_id?: ObjectId;
 
   @Column('string')
-  client_id?: TypeObjectID;
+  client_id?: ObjectId;
 
   @Column('number')
   number_id: number;
@@ -191,7 +191,7 @@ export default class Loan {
     };
   }
 
-  static validateData(values: IRawLoan, clientId?: ObjectID): Array<string> {
+  static validateData(values: IRawLoan, clientId?: ObjectId): Array<string> {
     const errors = [];
     if (!values) errors.push('query', 'Invalid request.');
     const { amount, weeks, weekly_payment, created } = values;

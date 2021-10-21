@@ -1,7 +1,5 @@
 import { flow } from 'lodash';
 import type { NextApiResponse } from 'next';
-import { ObjectID as TypeObjectId } from 'typeorm';
-import { ObjectID } from 'mongodb';
 import { ISerializedCharge } from '../../../../../../database/interfaces/ICharge';
 import { AuthorizedNextApiRequest } from '../../../../../../database/interfaces/ICommon';
 import ChargeService from '../../../../../../database/services/ChargeService';
@@ -20,8 +18,8 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { clientId, chargeId } = req.query;
-      const client = await ClientService.getClient(id as TypeObjectId, clientId as string);
-      const charge = await ChargeService.payCharge(client, new ObjectID(chargeId));
+      const client = await ClientService.getClient(id?.toString() as string, clientId as string);
+      const charge = await ChargeService.payCharge(client, chargeId as string);
 
       return res.status(200).json(charge.serialize());
     }

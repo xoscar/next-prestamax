@@ -34,7 +34,7 @@ module.exports = {
         ignoreTrailingComments: true,
       },
     ],
-    'import/no-cycle': 1,
+    'import/no-cycle': 0,
     'global-require': 2,
     'consistent-return': 0,
     'object-curly-newline': ['error', { consistent: true }],
@@ -43,6 +43,7 @@ module.exports = {
     'react/no-unknown-property': ['error', { ignore: ['class'] }],
     '@typescript-eslint/no-explicit-any': ['error'],
     '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-unused-vars': 2,
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
     '@typescript-eslint/naming-convention': [

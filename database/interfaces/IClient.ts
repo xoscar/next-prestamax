@@ -1,8 +1,8 @@
-import { ObjectID } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 export interface IRawClient {
-  id?: ObjectID;
-  user_id: ObjectID;
+  id?: ObjectId;
+  user_id: ObjectId;
   client_id: string;
   name: string;
   surname: string;
@@ -14,8 +14,8 @@ export interface IRawClient {
 }
 
 export interface ISerializedClient {
-  id?: ObjectID;
-  user_id?: ObjectID;
+  id?: ObjectId;
+  user_id?: ObjectId;
   name: string;
   surname: string;
   created: Date;

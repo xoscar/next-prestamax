@@ -1,5 +1,5 @@
-import { getMongoRepository, ObjectID as TypeObjectID } from 'typeorm';
-import { ObjectID } from 'mongodb';
+import { getMongoRepository } from 'typeorm';
+import { ObjectId } from 'mongodb';
 import { IRawClient, ISerializedClient } from '../interfaces/IClient';
 import Client from '../models/Client';
 import DatabaseConnection from '../utils/DatabaseConnection';
@@ -12,16 +12,16 @@ export type ILoginUserResponse = ISerializedClient & {
 export default class ClientService extends DatabaseConnection {
   static clientRepository = getMongoRepository(Client);
 
-  static async getClient(userId: TypeObjectID, clientId: string): Promise<Client> {
+  static async getClient(userId: string, clientId: string): Promise<Client> {
     const client = await this.clientRepository.findOne({
-      user_id: new ObjectID(userId),
+      user_id: new ObjectId(userId),
       client_id: clientId,
     });
 
     return client || Promise.reject(['Client not found.']);
   }
 
-  static async createClient(userId: TypeObjectID, values: IRawClient): Promise<Client> {
+  static async createClient(userId: string, values: IRawClient): Promise<Client> {
     const errors = Client.validateClient(values);
 
     if (!!errors.length) return Promise.reject(errors);
@@ -43,18 +43,14 @@ export default class ClientService extends DatabaseConnection {
 
     const client = new Client({
       ...values,
-      user_id: new ObjectID(userId),
+      user_id: new ObjectId(userId),
       client_id: `${clientId}${number}`,
     });
 
     return this.clientRepository.save(client);
   }
 
-  static async updateClient(
-    userId: TypeObjectID,
-    clientId: string,
-    values: IRawClient,
-  ): Promise<Client> {
+  static async updateClient(userId: string, clientId: string, values: IRawClient): Promise<Client> {
     const errors = Client.validateClient(values);
 
     if (!!errors.length) return Promise.reject(errors);
@@ -71,12 +67,12 @@ export default class ClientService extends DatabaseConnection {
     return this.clientRepository.save(client);
   }
 
-  static async deleteClient(userId: TypeObjectID, clientId: string): Promise<void> {
+  static async deleteClient(userId: string, clientId: string): Promise<void> {
     const client = await this.getClient(userId, clientId);
-    await LoanService.deleteClientLoans(userId, client.id as TypeObjectID);
+    await LoanService.deleteClientLoans(userId, client.id?.toString() as string);
     await this.clientRepository.deleteOne({
-      id: new ObjectID(clientId),
-      userId: new ObjectID(userId),
+      id: new ObjectId(clientId),
+      userId: new ObjectId(userId),
     });
   }
 }

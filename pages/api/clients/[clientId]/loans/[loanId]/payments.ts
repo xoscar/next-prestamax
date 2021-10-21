@@ -1,7 +1,5 @@
 import { flow } from 'lodash';
 import type { NextApiResponse } from 'next';
-import { ObjectID as TypedObjectID } from 'typeorm';
-import { ObjectID } from 'mongodb';
 import { AuthorizedNextApiRequest } from '../../../../../../database/interfaces/ICommon';
 import { ISerializedPayment } from '../../../../../../database/interfaces/IPayment';
 import ClientService from '../../../../../../database/services/ClientService';
@@ -21,7 +19,7 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { loanId } = req.query;
-      const loan = await LoanService.getLoan(id as TypedObjectID, new ObjectID(loanId));
+      const loan = await LoanService.getLoan(id?.toString() as string, loanId as string);
 
       return res.status(200).json(loan.getPayments().map((payment) => payment.serialize()));
     }
@@ -31,10 +29,10 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { clientId, loanId } = req.query;
-      await ClientService.getClient(id as ObjectID, clientId as string);
+      await ClientService.getClient(id?.toString() as string, clientId as string);
       const payment = await PaymentService.createPayment(
-        id as TypedObjectID,
-        new ObjectID(loanId),
+        id?.toString() as string,
+        loanId as string,
         req.body,
       );
 

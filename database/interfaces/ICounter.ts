@@ -1,13 +1,12 @@
-import { ObjectID } from 'typeorm';
-
+import { ObjectId } from 'mongodb';
 export interface IRawCounter {
-  id?: ObjectID;
+  id?: ObjectId;
   count: number;
   name: string;
 }
 
 export interface ISerializedCounter {
-  id?: ObjectID;
+  id?: ObjectId;
   count: number;
   name: string;
 }

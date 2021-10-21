@@ -1,12 +1,13 @@
-import { Entity, ObjectID, ObjectIdColumn, Column } from 'typeorm';
+import { Entity, ObjectIdColumn, Column } from 'typeorm';
 import validator from 'validator';
 import { isEmpty } from 'lodash';
 import { IRawUser, ISerializedUser } from '../interfaces/IUser';
+import { ObjectId } from 'mongodb';
 
 @Entity('users')
 export default class User {
   @ObjectIdColumn()
-  id?: ObjectID;
+  id?: ObjectId;
 
   @Column('string')
   name: string;

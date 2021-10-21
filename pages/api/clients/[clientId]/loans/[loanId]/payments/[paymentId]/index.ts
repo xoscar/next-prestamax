@@ -1,7 +1,5 @@
 import { flow } from 'lodash';
 import type { NextApiResponse } from 'next';
-import { ObjectID as TypedObjectID } from 'typeorm';
-import { ObjectID } from 'mongodb';
 import { AuthorizedNextApiRequest } from '../../../../../../../../database/interfaces/ICommon';
 import { HttpMethods } from '../../../../../../../../enums/http';
 import withApiErrorHandler from '../../../../../../../../middlewares/errorHandler';
@@ -20,9 +18,9 @@ const handler = async (
       } = req.user;
       const { loanId, paymentId } = req.query;
       const payment = await PaymentService.getPayment(
-        id as TypedObjectID,
-        new ObjectID(loanId),
-        new ObjectID(paymentId),
+        id?.toString() as string,
+        loanId as string,
+        paymentId as string,
       );
 
       return res.status(200).json(payment.serialize());
@@ -34,9 +32,9 @@ const handler = async (
       } = req.user;
       const { loanId, paymentId } = req.query;
       const payment = await PaymentService.updatePayment(
-        id as TypedObjectID,
-        new ObjectID(loanId),
-        new ObjectID(paymentId),
+        id?.toString() as string,
+        loanId as string,
+        paymentId as string,
         req.body,
       );
 
@@ -49,9 +47,9 @@ const handler = async (
       } = req.user;
       const { paymentId, loanId } = req.query;
       await PaymentService.deletePayment(
-        id as TypedObjectID,
-        new ObjectID(loanId),
-        new ObjectID(paymentId),
+        id?.toString() as string,
+        loanId as string,
+        paymentId as string,
       );
 
       return res.status(204).end();

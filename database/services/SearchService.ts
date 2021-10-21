@@ -1,5 +1,5 @@
 import { getManager } from 'typeorm';
-import { ObjectID } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import validator from 'validator';
 import Client from '../models/Client';
 import DatabaseConnection from '../utils/DatabaseConnection';
@@ -38,13 +38,13 @@ export default class SearchService extends DatabaseConnection {
 
   static async runQuery<T>(
     model: SearchableModel,
-    userId: ObjectID,
+    userId: ObjectId,
     query: Query,
   ): Promise<Array<T>> {
     const { take, skip, termsList } = this.parseQuery(query);
 
     const documentList = await this.manager.find(model, {
-      where: { $and: termsList, user_id: new ObjectID(userId) },
+      where: { $and: termsList, user_id: new ObjectId(userId) },
       take,
       skip,
       order: {

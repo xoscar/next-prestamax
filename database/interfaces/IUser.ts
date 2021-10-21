@@ -1,7 +1,7 @@
-import { ObjectID } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 export interface IRawUser {
-  id?: ObjectID;
+  id?: ObjectId;
   username: string;
   password: string;
   name: string;
@@ -10,7 +10,7 @@ export interface IRawUser {
 }
 
 export interface ISerializedUser {
-  id?: ObjectID;
+  id?: ObjectId;
   username: string;
   name: string;
   role: string;

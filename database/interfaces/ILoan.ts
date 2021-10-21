@@ -1,11 +1,11 @@
-import { ObjectID } from 'typeorm';
+import { ObjectId } from 'mongodb';
 import { IRawPayment, ISerializedPayment } from './IPayment';
 
 export interface IRawLoan {
-  _id?: ObjectID;
-  id?: ObjectID;
-  client_id?: ObjectID;
-  user_id: ObjectID;
+  _id?: ObjectId;
+  id?: ObjectId;
+  client_id?: ObjectId;
+  user_id: ObjectId;
   number_id: number;
   amount: number;
   weekly_payment: number;
@@ -23,8 +23,8 @@ export interface IRawLoan {
 }
 
 export interface ISerializedLoan {
-  id?: ObjectID;
-  client_id?: ObjectID;
+  id?: ObjectId;
+  client_id?: ObjectId;
   number_id: number;
   amount: number;
   description: string;

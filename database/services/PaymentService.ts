@@ -1,4 +1,4 @@
-import { getMongoRepository, ObjectID as TypeObjectID } from 'typeorm';
+import { getMongoRepository } from 'typeorm';
 import Loan from '../models/Loan';
 import DatabaseConnection from '../utils/DatabaseConnection';
 import { IRawLoan } from '../interfaces/ILoan';
@@ -8,21 +8,17 @@ import LoanService from './LoanService';
 
 export type LoanQuery = {
   finished: boolean;
-  clientId: TypeObjectID;
+  clientId: string;
 };
 
 export default class PaymentService extends DatabaseConnection {
   static loanRepository = getMongoRepository(Loan);
 
-  private static findPayment(loan: Loan, paymentId: TypeObjectID) {
+  private static findPayment(loan: Loan, paymentId: string) {
     return loan.getPayments().find(({ _id }) => paymentId.toString() === _id?.toString());
   }
 
-  static async getPayment(
-    userId: TypeObjectID,
-    loanId: TypeObjectID,
-    paymentId: TypeObjectID,
-  ): Promise<Payment> {
+  static async getPayment(userId: string, loanId: string, paymentId: string): Promise<Payment> {
     const loan = await LoanService.getLoan(userId, loanId);
 
     const payment = this.findPayment(loan, paymentId);
@@ -31,8 +27,8 @@ export default class PaymentService extends DatabaseConnection {
   }
 
   static async createPayment(
-    userId: TypeObjectID,
-    loanId: TypeObjectID,
+    userId: string,
+    loanId: string,
     values: IRawPayment,
   ): Promise<Payment> {
     const loan = await LoanService.getLoan(userId, loanId);
@@ -53,9 +49,9 @@ export default class PaymentService extends DatabaseConnection {
   }
 
   static async updatePayment(
-    userId: TypeObjectID,
-    loanId: TypeObjectID,
-    paymentId: TypeObjectID,
+    userId: string,
+    loanId: string,
+    paymentId: string,
     values: IRawLoan,
   ): Promise<Payment> {
     const loan = await LoanService.getLoan(userId, loanId);
@@ -81,11 +77,7 @@ export default class PaymentService extends DatabaseConnection {
     return new Payment(payment);
   }
 
-  static async deletePayment(
-    userId: TypeObjectID,
-    loanId: TypeObjectID,
-    paymentId: TypeObjectID,
-  ): Promise<void> {
+  static async deletePayment(userId: string, loanId: string, paymentId: string): Promise<void> {
     const loan = await LoanService.getLoan(userId, loanId);
 
     loan.payments = loan.payments.filter(({ _id: id }) => id?.toString() !== paymentId.toString());

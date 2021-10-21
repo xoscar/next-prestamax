@@ -1,7 +1,5 @@
 import { flow } from 'lodash';
 import type { NextApiResponse } from 'next';
-import { ObjectID as TypedObjectID } from 'typeorm';
-import { ObjectID } from 'mongodb';
 import { AuthorizedNextApiRequest } from '../../../../../../database/interfaces/ICommon';
 import ClientService from '../../../../../../database/services/ClientService';
 import { HttpMethods } from '../../../../../../enums/http';
@@ -20,8 +18,8 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { chargeId, clientId } = req.query;
-      await ClientService.getClient(id as TypedObjectID, clientId as string);
-      const charge = await ChargeService.getCharge(chargeId as unknown as TypedObjectID);
+      await ClientService.getClient(id?.toString() as string, clientId as string);
+      const charge = await ChargeService.getCharge(chargeId as string);
 
       return res.status(200).json(charge.serialize());
     }
@@ -31,8 +29,8 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { chargeId, clientId } = req.query;
-      const client = await ClientService.getClient(id as TypedObjectID, clientId as string);
-      const charge = await ChargeService.updateCharge(client, new ObjectID(chargeId), req.body);
+      const client = await ClientService.getClient(id?.toString() as string, clientId as string);
+      const charge = await ChargeService.updateCharge(client, chargeId as string, req.body);
 
       return res.status(200).json(charge.serialize());
     }
@@ -42,8 +40,8 @@ const handler = async (
         payload: { id },
       } = req.user;
       const { clientId, chargeId } = req.query;
-      await ClientService.getClient(id as TypedObjectID, clientId as string);
-      await ChargeService.deleteCharge(new ObjectID(chargeId));
+      await ClientService.getClient(id?.toString() as string, clientId as string);
+      await ChargeService.deleteCharge(chargeId as string);
 
       return res.status(204).end();
     }
