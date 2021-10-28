@@ -35,6 +35,7 @@ export default class ChargeService extends DatabaseConnection {
 
     const charge = new Charge(values);
 
+    charge.created = new Date();
     charge.user_id = new ObjectId(client.user_id);
     charge.client_id = new ObjectId(client.id);
 
@@ -47,11 +48,11 @@ export default class ChargeService extends DatabaseConnection {
     if (errors.length) return Promise.reject(errors);
 
     const charge = await this.getCharge(chargeId);
-    const { amount, created, description } = values;
+    const { amount, description, expiration_date } = values;
 
     charge.amount = amount;
-    charge.created = created;
     charge.description = description;
+    charge.expiration_date = new Date(expiration_date);
 
     return this.chargeRepository.save(charge);
   }
@@ -68,6 +69,6 @@ export default class ChargeService extends DatabaseConnection {
   static async deleteCharge(chargeId: string): Promise<void> {
     const parsedChargeId = new ObjectId(chargeId);
 
-    await this.chargeRepository.deleteOne({ id: parsedChargeId });
+    await this.chargeRepository.deleteOne({ _id: parsedChargeId });
   }
 }

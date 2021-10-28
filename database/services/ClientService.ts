@@ -12,6 +12,14 @@ export type ILoginUserResponse = ISerializedClient & {
 export default class ClientService extends DatabaseConnection {
   static clientRepository = getMongoRepository(Client);
 
+  static async getClientById(clientId: string): Promise<Client> {
+    const client = await this.clientRepository.findOne({
+      _id: new ObjectId(clientId),
+    });
+
+    return client || Promise.reject(['Client not found.']);
+  }
+
   static async getClient(userId: string, clientId: string): Promise<Client> {
     const client = await this.clientRepository.findOne({
       user_id: new ObjectId(userId),
@@ -69,10 +77,10 @@ export default class ClientService extends DatabaseConnection {
 
   static async deleteClient(userId: string, clientId: string): Promise<void> {
     const client = await this.getClient(userId, clientId);
+
     await LoanService.deleteClientLoans(userId, client.id?.toString() as string);
     await this.clientRepository.deleteOne({
-      id: new ObjectId(clientId),
-      userId: new ObjectId(userId),
+      _id: client.id,
     });
   }
 }

@@ -85,7 +85,7 @@ class Client extends Record<ClientType>(defaultValues) {
       ...rawClient,
       created: new Date(created),
       updated: new Date(updated),
-      stats: this.createStatsFromRaw(stats),
+      stats: stats ? this.createStatsFromRaw(stats) : undefined,
     });
   }
 

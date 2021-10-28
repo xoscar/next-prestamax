@@ -12,7 +12,7 @@ export default class Loan {
   @ObjectIdColumn()
   _id?: ObjectId;
 
-  @ObjectIdColumn({ name: 'id' })
+  @ObjectIdColumn()
   id?: ObjectId;
 
   @Column('string')

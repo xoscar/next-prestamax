@@ -1,4 +1,5 @@
 import { Button, Card, CardActions, CardContent } from '@mui/material';
+import Link from 'next/link';
 import { formatRelative, isValid } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
 import { FunctionComponent } from 'react';
@@ -62,7 +63,9 @@ const ClientCard: FunctionComponent<ClientCardProps> = ({
           </DataEntry>
         </CardContent>
         <CardActions>
-          <Button size="small">Ver Más</Button>
+          <Link href={`/clients/${client_id}`} passHref>
+            <Button size="small">Ver Más</Button>
+          </Link>
         </CardActions>
       </Card>
     </CardWrapper>

@@ -6,7 +6,7 @@ import DatabaseConnection from '../utils/DatabaseConnection';
 import Loan from '../models/Loan';
 
 export type SearchableModel = typeof Client | typeof Loan;
-export type Query = { [key: string]: string | string[] };
+export type Query = { [key: string]: string | string[] | boolean | number };
 
 const { isInt } = validator;
 
@@ -36,15 +36,16 @@ export default class SearchService extends DatabaseConnection {
     };
   }
 
-  static async runQuery<T>(
+  static async runQuery<T, Q = unknown>(
     model: SearchableModel,
     userId: ObjectId,
     query: Query,
+    extraQuery: Q = {} as Q,
   ): Promise<Array<T>> {
     const { take, skip, termsList } = this.parseQuery(query);
 
     const documentList = await this.manager.find(model, {
-      where: { $and: termsList, user_id: new ObjectId(userId) },
+      where: { $and: termsList, user_id: new ObjectId(userId), ...extraQuery },
       take,
       skip,
       order: {

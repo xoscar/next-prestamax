@@ -1,28 +1,42 @@
-import { FunctionComponent, useMemo, useState } from 'react';
+import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { Formik, FormikProps } from 'formik';
 import { Button, TextField } from '@mui/material';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockIcon from '@mui/icons-material/Lock';
-import { FIELDS, formikProps } from './clientFormFormikProps';
-import Client, { FormDataClientType } from '../../records/Client';
+import { FIELDS, formikProps } from './loanFormFormikProps';
 import {
   ActionsContainer,
   AddressFormSection,
   Container,
   FormSection,
   SubmitButton,
-} from './clientFormStyled';
+} from './loanFormStyled';
+import Loan, { FormDataLoanType } from '../../records/Loan';
 
-export type ClientFormProps = {
-  client?: Client;
-  onSubmit(values: FormDataClientType): void;
+export type LoanFormFormProps = {
+  loan?: Loan;
+  onSubmit(values: FormDataLoanType): void;
   onCancel(): void;
 };
 
-const ClientForm: FunctionComponent<ClientFormProps> = ({ client, onSubmit, onCancel }) => {
-  const { isInitialValid, initialValues, validate } = useMemo(() => formikProps(client), [client]);
+const LoanForm: FunctionComponent<LoanFormFormProps> = ({ loan, onSubmit, onCancel }) => {
+  const { isInitialValid, initialValues, validate } = useMemo(() => formikProps(loan), [loan]);
   const [isDisabled, setIsDisabled] = useState(!!isInitialValid);
   const isEditing = !!isInitialValid;
+
+  const parseValues = useCallback(
+    ({ amount, weeks, weekly_payment, description }: FormDataLoanType): void => {
+      const parsedData: FormDataLoanType = {
+        amount: +amount,
+        weeks: +weeks,
+        weekly_payment: +weekly_payment,
+        description,
+      };
+
+      onSubmit(parsedData);
+    },
+    [onSubmit],
+  );
 
   return (
     <Formik
@@ -30,74 +44,77 @@ const ClientForm: FunctionComponent<ClientFormProps> = ({ client, onSubmit, onCa
       initialValues={initialValues}
       validateOnChange={false}
       validate={validate}
-      onSubmit={onSubmit}
+      onSubmit={parseValues}
     >
-      {({ values, errors, setFieldValue, submitForm }: FormikProps<FormDataClientType>) => {
+      {({ values, errors, setFieldValue, submitForm }: FormikProps<FormDataLoanType>) => {
         return (
           <>
             <Container>
               <FormSection>
                 <TextField
-                  id="input-client-name"
-                  label="Nombre"
-                  error={!!errors[FIELDS.NAME]}
-                  helperText={errors[FIELDS.NAME]}
+                  id="input-loan-amount"
+                  label="Cantidad"
+                  error={!!errors[FIELDS.AMOUNT]}
+                  helperText={errors[FIELDS.AMOUNT]}
                   onChange={(event) => {
                     const newValue = event.target.value;
-                    setFieldValue(FIELDS.NAME, newValue);
+                    setFieldValue(FIELDS.AMOUNT, newValue);
                   }}
                   disabled={isDisabled}
                   fullWidth
+                  type="number"
                   variant="standard"
-                  value={values.name}
+                  value={values.amount}
                 />
               </FormSection>
               <FormSection>
                 <TextField
-                  id="input-client-surname"
-                  label="Apellido"
-                  error={!!errors[FIELDS.SURNAME]}
-                  helperText={errors[FIELDS.SURNAME]}
+                  id="input-loan-weeks"
+                  label="Semanas"
+                  error={!!errors[FIELDS.WEEKS]}
+                  helperText={errors[FIELDS.WEEKS]}
                   onChange={(event) => {
                     const newValue = event.target.value;
-                    setFieldValue(FIELDS.SURNAME, newValue);
+                    setFieldValue(FIELDS.WEEKS, newValue);
                   }}
                   disabled={isDisabled}
                   fullWidth
+                  type="number"
                   variant="standard"
-                  value={values.surname}
+                  value={values.weeks}
                 />
               </FormSection>
               <FormSection>
                 <TextField
-                  id="input-client-phone"
-                  label="Telefono"
-                  error={!!errors[FIELDS.PHONE]}
-                  helperText={errors[FIELDS.PHONE]}
+                  id="input-loan-weekly-payment"
+                  label="Pago Semanal"
+                  error={!!errors[FIELDS.WEEKLY_PAYMENT]}
+                  helperText={errors[FIELDS.WEEKLY_PAYMENT]}
                   onChange={(event) => {
                     const newValue = event.target.value;
-                    setFieldValue(FIELDS.PHONE, newValue);
+                    setFieldValue(FIELDS.WEEKLY_PAYMENT, newValue);
                   }}
                   disabled={isDisabled}
                   fullWidth
                   variant="standard"
-                  value={values.phone}
+                  type="number"
+                  value={values.weekly_payment}
                 />
               </FormSection>
               <AddressFormSection>
                 <TextField
-                  id="input-client-address"
-                  label="Direccion"
-                  error={!!errors[FIELDS.ADDRESS]}
-                  helperText={errors[FIELDS.ADDRESS]}
+                  id="input-loan-description"
+                  label="Descripcion"
+                  error={!!errors[FIELDS.DESCRIPTION]}
+                  helperText={errors[FIELDS.DESCRIPTION]}
                   onChange={(event) => {
                     const newValue = event.target.value;
-                    setFieldValue(FIELDS.ADDRESS, newValue);
+                    setFieldValue(FIELDS.DESCRIPTION, newValue);
                   }}
                   disabled={isDisabled}
                   fullWidth
                   variant="standard"
-                  value={values.address}
+                  value={values.description}
                 />
               </AddressFormSection>
             </Container>
@@ -130,4 +147,4 @@ const ClientForm: FunctionComponent<ClientFormProps> = ({ client, onSubmit, onCa
   );
 };
 
-export default ClientForm;
+export default LoanForm;

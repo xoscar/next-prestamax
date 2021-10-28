@@ -19,12 +19,12 @@ export type LoanCardProps = {
 
 const LoanCard: FunctionComponent<LoanCardProps> = ({
   loan: { weeks, number_id, current_balance, paymentList, amount, created, expired_date, expired },
-  // showClientDetails = false,
 }) => {
   const createdAt = isValid(created) && formatRelative(created, new Date(), { locale: esLocale });
   const expiresAt =
     isValid(expired_date) && formatRelative(expired_date, new Date(), { locale: esLocale });
   const isExpired = !!expired ? 'Si' : 'No';
+  const currentBalance = current_balance ? `$${current_balance.toFixed(2)}` : 'Pagado';
 
   return (
     <CardWrapper>
@@ -50,14 +50,14 @@ const LoanCard: FunctionComponent<LoanCardProps> = ({
           </DataEntry>
           <DataEntry>
             <DataEntryFieldText>Adeudo Actual</DataEntryFieldText>{' '}
-            <DataEntryFieldValue>{current_balance}</DataEntryFieldValue>
+            <DataEntryFieldValue>{currentBalance}</DataEntryFieldValue>
           </DataEntry>
           <DataEntry>
-            <DataEntryFieldText>Expira</DataEntryFieldText>{' '}
+            <DataEntryFieldText>Vence en</DataEntryFieldText>{' '}
             <DataEntryFieldValue>{expiresAt}</DataEntryFieldValue>
           </DataEntry>
           <DataEntry>
-            <DataEntryFieldText>Expirado</DataEntryFieldText>{' '}
+            <DataEntryFieldText>Vencido</DataEntryFieldText>{' '}
             <DataEntryFieldValue>{isExpired}</DataEntryFieldValue>
           </DataEntry>
         </CardContent>

@@ -31,7 +31,7 @@ const MobileNavigation: FunctionComponent<MobileNavigationProps> = ({ isOpen, on
         </ListItem>
         <ListItem>
           <OptionLink href="/loans">
-            <OptionText>Loans</OptionText>
+            <OptionText>Prestamos</OptionText>
           </OptionLink>
         </ListItem>
         <Divider />

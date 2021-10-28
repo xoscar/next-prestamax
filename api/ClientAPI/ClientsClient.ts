@@ -1,7 +1,7 @@
 import Client, { FormDataClientType, RawClientType } from '../../records/Client';
 import AuthenticatedClient from '../AuthenticatedClient';
 
-const { get, post, getOne } = AuthenticatedClient<FormDataClientType, RawClientType>(
+const { get, post, getOne, put, remove } = AuthenticatedClient<FormDataClientType, RawClientType>(
   '/api/clients',
 );
 
@@ -9,6 +9,8 @@ type ClientsClientType = {
   get(parameters: { search: string; pageNumber: number; pageSize: number }): Promise<Array<Client>>;
   getOne(clientId: string): Promise<Client>;
   create(values: FormDataClientType): Promise<Client>;
+  update(clientId: string, values: FormDataClientType): Promise<Client>;
+  remove(clientId: string): Promise<void>;
 };
 
 const ClientsClient: ClientsClientType = {
@@ -32,6 +34,21 @@ const ClientsClient: ClientsClientType = {
     });
 
     return Client.createFromRawSearch(rawClient);
+  },
+  async update(clientId, values) {
+    const { json: rawClient } = await put({
+      body: values,
+      id: clientId,
+    });
+
+    return Client.createFromRawSearch(rawClient);
+  },
+  async remove(clientId) {
+    await remove({
+      id: clientId,
+    });
+
+    return;
   },
 };
 

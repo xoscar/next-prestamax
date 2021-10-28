@@ -1,4 +1,5 @@
 import { Record } from 'immutable';
+import Client, { RawClientType } from './Client';
 
 export type RawLoanType = {
   id: string;
@@ -19,6 +20,7 @@ export type RawLoanType = {
   current_balance: number;
   last_payment: string;
   payments: Array<string>;
+  client: RawClientType;
 };
 
 export type LoanType = {
@@ -40,6 +42,7 @@ export type LoanType = {
   current_balance: number;
   last_payment: Date;
   paymentList: Array<string>;
+  client: Client;
 };
 
 const defaultValues = {
@@ -61,6 +64,7 @@ const defaultValues = {
   expired_date: new Date(),
   last_payment: new Date(),
   paymentList: [],
+  client: new Client(),
 };
 
 export type FormDataLoanType = {
@@ -72,7 +76,8 @@ export type FormDataLoanType = {
 
 class Loan extends Record<LoanType>(defaultValues) {
   static createFromRaw(rawLoan: RawLoanType): Loan {
-    const { created, updated, finished_date, expired_date, last_payment, payments } = rawLoan;
+    const { created, updated, finished_date, expired_date, last_payment, payments, client } =
+      rawLoan;
 
     return new this({
       ...rawLoan,
@@ -82,6 +87,7 @@ class Loan extends Record<LoanType>(defaultValues) {
       finished_date: new Date(finished_date),
       expired_date: new Date(expired_date),
       last_payment: new Date(last_payment),
+      client: Client.createFromRawSearch(client),
     });
   }
 }

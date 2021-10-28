@@ -42,6 +42,7 @@ export default class LoanService extends DatabaseConnection {
     loan.client_id = new ObjectId(client.id);
     loan.user_id = new ObjectId(client.user_id);
     loan.number_id = counter.count;
+    loan.finished = false;
     loan.setSearch(client);
 
     counter.count = counter.count + 1;
@@ -58,6 +59,7 @@ export default class LoanService extends DatabaseConnection {
     const loan = await this.getLoan(client.user_id?.toString() as string, loanId);
 
     loan.update(values);
+    loan.finished = !loan.currentBalance;
 
     await this.loanRepository.save(loan);
 

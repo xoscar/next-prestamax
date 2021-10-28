@@ -15,7 +15,7 @@ export interface ResponseAPI<T> {
 export interface RequestParams<T> {
   id?: string;
   body?: T;
-  queryParams?: IKeyValue<string | number>;
+  queryParams?: IKeyValue<string | number | boolean | undefined>;
   pathParameters?: IKeyValue<string>;
   headers?: IKeyValue<string>;
 }

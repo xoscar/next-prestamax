@@ -40,8 +40,8 @@ export default class PaymentService extends DatabaseConnection {
     const payment = new Payment(values);
 
     loan.payments = [...loan.payments, payment];
-    loan.finished = !!loan.currentBalance;
     loan.updated = new Date();
+    loan.finished = !loan.currentBalance;
 
     await this.loanRepository.save(loan);
 
@@ -71,6 +71,8 @@ export default class PaymentService extends DatabaseConnection {
     loan.payments = loan.payments
       .filter(({ _id: id }) => id?.toString() !== paymentId.toString())
       .concat([payment]);
+    loan.finished = !loan.currentBalance;
+    loan.updated = new Date();
 
     await this.loanRepository.save(loan);
 
@@ -81,6 +83,8 @@ export default class PaymentService extends DatabaseConnection {
     const loan = await LoanService.getLoan(userId, loanId);
 
     loan.payments = loan.payments.filter(({ _id: id }) => id?.toString() !== paymentId.toString());
+    loan.finished = !loan.currentBalance;
+    loan.updated = new Date();
 
     await this.loanRepository.save(loan);
   }

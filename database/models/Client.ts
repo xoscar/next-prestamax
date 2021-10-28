@@ -5,6 +5,9 @@ import { IRawClient, ISerializedClient } from '../interfaces/IClient';
 @Entity('clients')
 export default class Client {
   @ObjectIdColumn()
+  _id?: ObjectId;
+
+  @ObjectIdColumn()
   id?: ObjectId;
 
   @Column('string')

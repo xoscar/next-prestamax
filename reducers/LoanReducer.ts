@@ -1,62 +1,131 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import LoginClient, { LoginParameters } from '../api/UserAPI/LoginClient';
-import SessionClient from '../api/UserAPI/SessionClient';
-import { LoadingState, LoggedInStatus, Routes } from '../enums/common';
-import User from '../records/User';
-import { getIsPublicPath } from '../utils/router';
+import { keyBy } from 'lodash';
+import LoansClient from '../api/LoansAPI/LoansClient';
+import { LoadingState } from '../enums/common';
+import Loan, { FormDataLoanType } from '../records/Loan';
+import { AppState } from '../tools/configureStore';
 
-type UserReducerInitialState = {
-  user?: User;
-  loggedInStatus: LoggedInStatus;
+const DEFAULT_PAGE_SIZE = 20;
+
+type LoanReducerInitialState = {
+  loan?: Loan;
+  loanList: { [key: string]: Loan };
   loadingState: LoadingState;
+  hasMoreItems: boolean;
+  pageNumber: number;
 };
 
-export const loginUser = createAsyncThunk<User, LoginParameters>(
-  'users/loginUser',
-  async (params) => {
-    const user = await LoginClient.authenticate(params);
+type SearchLoansParamsType = {
+  search: string;
+  clientId?: string;
+  finished: boolean;
+};
 
-    SessionClient.saveSession(user);
-    await Router.push({ pathname: Routes.HOME });
+export const searchLoans = createAsyncThunk<Array<Loan>, SearchLoansParamsType>(
+  'loans/searchLoans',
+  async ({ search, clientId, finished }) => {
+    const loanList = await LoansClient.get({
+      search,
+      pageNumber: 0,
+      pageSize: DEFAULT_PAGE_SIZE,
+      clientId,
+      finished,
+    });
 
-    return user;
+    return loanList;
   },
 );
 
-export const logoutUser = createAsyncThunk('users/logoutUser', async () => {
-  SessionClient.removeSession();
-  await Router.push({ pathname: Routes.LOGIN });
+export const loadNextPage = createAsyncThunk<Array<Loan>, SearchLoansParamsType>(
+  'loans/loadNextPage',
+  async ({ search = '', clientId, finished }, { getState }) => {
+    const { pageNumber } = (getState() as AppState).loans;
+
+    const loanList = await LoansClient.get({
+      search,
+      pageNumber,
+      pageSize: DEFAULT_PAGE_SIZE,
+      clientId,
+      finished,
+    });
+
+    return loanList;
+  },
+);
+
+export const addLoan = createAsyncThunk<Loan, { clientId: string; values: FormDataLoanType }>(
+  'loans/addLoan',
+  async ({ clientId, values }) => {
+    const loan = await LoansClient.create(clientId, values);
+
+    return loan;
+  },
+);
+
+export const updateLoan = createAsyncThunk<
+  Loan,
+  { clientId: string; loanId: string; values: FormDataLoanType }
+>('loans/updateLoan', async ({ clientId, loanId, values }) => {
+  const loan = await LoansClient.update(clientId, loanId, values);
+
+  return loan;
 });
 
-export const authCheck = createAsyncThunk('users/authCheck', async () => {
-  const user = SessionClient.getSession();
-
-  const isPublicPath = getIsPublicPath(Router.asPath);
-
-  if (!user) await Router.replace({ pathname: Routes.LOGIN });
-  if (!!user && isPublicPath) await Router.push({ pathname: Routes.HOME });
-
-  return user;
-});
-
-const initialState: UserReducerInitialState = {
-  user: undefined,
-  loggedInStatus: LoggedInStatus.LOGGED_OUT,
+const initialState: LoanReducerInitialState = {
+  loan: undefined,
+  loanList: {},
+  pageNumber: 0,
+  hasMoreItems: true,
   loadingState: LoadingState.IDLE,
 };
 
 const { actions, reducer } = createSlice({
-  name: 'users',
+  name: 'loans',
   initialState,
   reducers: {},
   extraReducers(builder) {
-    builder.addCase(loginUser.fulfilled, (state, action) => {
-      const { payload: user } = action;
+    builder
+      .addCase(searchLoans.fulfilled, (state, action) => {
+        const { payload: loanList } = action;
 
-      state.loadingState = LoadingState.SUCCESS;
-      state.loggedInStatus = LoggedInStatus.LOGGED_IN;
-      state.user = user;
-    });
+        state.loanList = {
+          ...keyBy(loanList, 'id'),
+        };
+
+        state.hasMoreItems = true;
+        state.pageNumber = 1;
+        state.loadingState = LoadingState.SUCCESS;
+      })
+      .addCase(loadNextPage.fulfilled, (state, action) => {
+        const { payload: loanList } = action;
+
+        state.loanList = {
+          ...state.loanList,
+          ...keyBy(loanList, 'id'),
+        };
+
+        if (loanList.length < DEFAULT_PAGE_SIZE) state.hasMoreItems = false;
+
+        state.pageNumber++;
+        state.loadingState = LoadingState.SUCCESS;
+      })
+      .addCase(addLoan.fulfilled, (state, action) => {
+        const { payload: loan } = action;
+
+        state.loanList = {
+          [loan.id as string]: loan,
+          ...state.loanList,
+        };
+
+        state.loadingState = LoadingState.SUCCESS;
+      })
+      .addCase(updateLoan.fulfilled, (state, action) => {
+        const { payload: loan } = action;
+
+        state.loan = loan;
+
+        state.loadingState = LoadingState.SUCCESS;
+      });
   },
 });
 

@@ -1,4 +1,4 @@
-import { Grid, Typography } from '@mui/material';
+import { Button, Grid, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import styled from 'styled-components';
 import { Media } from '../../styles/mixins';
@@ -30,4 +30,17 @@ export const EntryValueText = styled(Typography).attrs({
   variant: 'body2',
 })`
   color: ${({ theme }) => theme.subTextColor};
+`;
+
+export const DeleteButton = styled(Button).attrs({
+  variant: 'contained',
+})`
+  && {
+    align-self: flex-end;
+    background: ${({ theme }) => theme.headingColor};
+
+    &:hover {
+      background: ${({ theme }) => theme.headingColor};
+    }
+  }
 `;

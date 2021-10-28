@@ -6,9 +6,9 @@ export interface IRawCharge {
   amount: number;
   description: string;
   paid: boolean;
-  created: Date;
-  paid_date?: Date;
-  expiration_date: Date;
+  created: string;
+  paid_date?: string;
+  expiration_date: string;
   client_id?: ObjectId;
   user_id?: ObjectId;
 }

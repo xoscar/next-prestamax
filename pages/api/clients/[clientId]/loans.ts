@@ -4,13 +4,14 @@ import { AuthorizedNextApiRequest } from '../../../../database/interfaces/ICommo
 import { ISerializedLoan } from '../../../../database/interfaces/ILoan';
 import ClientService from '../../../../database/services/ClientService';
 import LoanService from '../../../../database/services/LoanService';
+import { LoanResult } from '../../../../database/viewModel/LoanViewModel';
 import { HttpMethods } from '../../../../enums/http';
 import withApiErrorHandler from '../../../../middlewares/errorHandler';
 import withJWTMiddleware from '../../../../middlewares/jwt';
 
 const handler = async (
   req: AuthorizedNextApiRequest,
-  res: NextApiResponse<ISerializedLoan | Array<ISerializedLoan>>,
+  res: NextApiResponse<ISerializedLoan | Array<ISerializedLoan> | LoanResult>,
 ): Promise<void> => {
   switch (req.method) {
     case HttpMethods.POST: {
@@ -21,7 +22,7 @@ const handler = async (
       const client = await ClientService.getClient(id?.toString() as string, clientId as string);
       const loan = await LoanService.createLoan(client, req.body);
 
-      return res.status(200).json(loan.serialize());
+      return res.status(200).json({ ...loan.serialize(), client: client.serialize() });
     }
 
     default: {

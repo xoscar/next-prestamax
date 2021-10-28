@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { keyBy } from 'lodash';
+import Router from 'next/router';
 import ClientsClient from '../api/ClientAPI/ClientsClient';
 import { LoadingState } from '../enums/common';
 import Client, { FormDataClientType } from '../records/Client';
@@ -67,6 +68,25 @@ export const addClient = createAsyncThunk<Client, FormDataClientType>(
   },
 );
 
+export const updateClient = createAsyncThunk<
+  Client,
+  { clientId: string; values: FormDataClientType }
+>('clients/updateClient', async ({ clientId, values }) => {
+  const client = await ClientsClient.update(clientId, values);
+
+  return client;
+});
+
+export const deleteClient = createAsyncThunk<void, string>(
+  'clients/deleteClient',
+  async (clientId) => {
+    await ClientsClient.remove(clientId);
+
+    Router.push('/home');
+    return;
+  },
+);
+
 const { actions, reducer } = createSlice({
   name: 'clients',
   initialState,
@@ -108,6 +128,13 @@ const { actions, reducer } = createSlice({
         state.loadingState = LoadingState.SUCCESS;
       })
       .addCase(getClient.fulfilled, (state, action) => {
+        const { payload: client } = action;
+
+        state.client = client;
+
+        state.loadingState = LoadingState.SUCCESS;
+      })
+      .addCase(updateClient.fulfilled, (state, action) => {
         const { payload: client } = action;
 
         state.client = client;
