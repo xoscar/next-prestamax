@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import Router from 'next/router';
-import LoansClient from '../api/LoansAPI/LoansClient';
+import LoansClient from '../gateways/LoansAPI/LoansClient';
 import Loan, { FormDataLoanType } from '../records/Loan';
 import { AppState } from '../tools/configureStore';
 

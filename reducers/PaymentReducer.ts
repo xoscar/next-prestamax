@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { keyBy } from 'lodash';
 import { getLoan } from '../actions/loanActions';
-import PaymentClient from '../api/PaymentAPI/PaymentClient';
+import PaymentClient from '../gateways/PaymentAPI/PaymentClient';
 import { LoadingState } from '../enums/common';
 import Payment, { FormDataPaymentType } from '../records/Payment';
 

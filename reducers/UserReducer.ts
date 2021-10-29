@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import Router from 'next/router';
-import LoginClient, { LoginParameters } from '../api/UserAPI/LoginClient';
-import SessionClient from '../api/UserAPI/SessionClient';
+import LoginClient, { LoginParameters } from '../gateways/UserAPI/LoginClient';
+import SessionClient from '../gateways/UserAPI/SessionClient';
 import { LoadingState, LoggedInStatus, Routes } from '../enums/common';
 import User from '../records/User';
 import { getIsPublicPath } from '../utils/router';

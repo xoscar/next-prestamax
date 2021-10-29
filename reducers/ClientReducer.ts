@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { keyBy } from 'lodash';
 import Router from 'next/router';
-import ClientsClient from '../api/ClientAPI/ClientsClient';
+import ClientsClient from '../gateways/ClientAPI/ClientsClient';
 import { LoadingState } from '../enums/common';
 import Client, { FormDataClientType } from '../records/Client';
 import { clientCurrentPageSelector } from '../selectors/clientSelectors';

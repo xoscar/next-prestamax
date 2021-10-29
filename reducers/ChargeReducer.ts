@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { keyBy } from 'lodash';
-import ChargeClient from '../api/ChargeAPI/ChargeClient';
+import ChargeClient from '../gateways/ChargeAPI/ChargeClient';
 import { LoadingState } from '../enums/common';
 import Charge, { FormDataChargeType } from '../records/Charge';
 import { AppState } from '../tools/configureStore';
