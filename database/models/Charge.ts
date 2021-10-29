@@ -55,11 +55,11 @@ export default class Charge {
     this._id = _id;
     this.id = id;
     this.amount = amount;
-    this.created = created;
+    this.created = new Date(created);
     this.description = description;
     this.paid = !!paid;
-    this.paid_date = paid_date;
-    this.expiration_date = expiration_date;
+    this.paid_date = paid_date ? new Date(paid_date) : undefined;
+    this.expiration_date = new Date(expiration_date);
     this.client_id = client_id;
     this.user_id = user_id;
   }

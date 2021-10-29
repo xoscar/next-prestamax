@@ -12,6 +12,8 @@ import {
   SubmitButton,
 } from './loanFormStyled';
 import Loan, { FormDataLoanType } from '../../records/Loan';
+import { DesktopDatePicker } from '@mui/lab';
+import formatISO from 'date-fns/formatISO';
 
 export type LoanFormFormProps = {
   loan?: Loan;
@@ -25,12 +27,13 @@ const LoanForm: FunctionComponent<LoanFormFormProps> = ({ loan, onSubmit, onCanc
   const isEditing = !!isInitialValid;
 
   const parseValues = useCallback(
-    ({ amount, weeks, weekly_payment, description }: FormDataLoanType): void => {
+    ({ amount, weeks, weekly_payment, description, created }: FormDataLoanType): void => {
       const parsedData: FormDataLoanType = {
         amount: +amount,
         weeks: +weeks,
         weekly_payment: +weekly_payment,
         description,
+        created,
       };
 
       onSubmit(parsedData);
@@ -101,6 +104,20 @@ const LoanForm: FunctionComponent<LoanFormFormProps> = ({ loan, onSubmit, onCanc
                   value={values.weekly_payment}
                 />
               </FormSection>
+              {isEditing && (
+                <FormSection>
+                  <DesktopDatePicker
+                    label="Creado"
+                    disabled={isDisabled}
+                    inputFormat="dd/MM/yyyy"
+                    value={values.created}
+                    onChange={(newValue) => {
+                      if (newValue) setFieldValue(FIELDS.CREATED, formatISO(new Date(newValue)));
+                    }}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </FormSection>
+              )}
               <AddressFormSection>
                 <TextField
                   id="input-loan-description"

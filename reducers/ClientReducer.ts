@@ -82,7 +82,7 @@ export const deleteClient = createAsyncThunk<void, string>(
   async (clientId) => {
     await ClientsClient.remove(clientId);
 
-    Router.push('/home');
+    await Router.push('/home');
     return;
   },
 );

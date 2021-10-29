@@ -17,8 +17,6 @@ export const chargeListHasMoreItemsSelector = createSelector(
   ({ hasMoreItems }) => hasMoreItems,
 );
 
-export const chargeSelector = createSelector(chargeReducerSelector, ({ charge }) => charge);
-
 export const chargeLoadingStateSelector = createSelector(
   chargeReducerSelector,
   ({ loadingState }) => loadingState,

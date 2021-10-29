@@ -1,4 +1,4 @@
-import queryString from 'query-string';
+import { stringify } from 'query-string';
 import { HttpMethods, ContentTypes } from '../enums/http';
 import { IKeyValue } from '../interfaces/ICommon';
 import {
@@ -32,8 +32,9 @@ const parseOptions = <T>({
   body,
 }: RestClientParams<T>) => {
   const options: ParseOption = {
-    endpoint: `${injectPathParameters(url, pathParameters)}?${queryString.stringify(queryParams, {
+    endpoint: `${injectPathParameters(url, pathParameters)}?${stringify(queryParams, {
       skipNull: true,
+      skipEmptyString: true,
     })}`,
     options: {
       method,

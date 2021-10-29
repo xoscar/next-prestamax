@@ -6,16 +6,24 @@ export enum FIELDS {
   WEEKS = 'weeks',
   WEEKLY_PAYMENT = 'weekly_payment',
   DESCRIPTION = 'description',
+  CREATED = 'created',
 }
 
 export const getInitialValues = (loan?: Loan): FormDataLoanType => {
-  const { amount = 0, weeks = 0, weekly_payment = 0, description = '' } = loan || {};
+  const {
+    amount = 0,
+    weeks = 0,
+    weekly_payment = 0,
+    description = '',
+    created = new Date(),
+  } = loan || {};
 
   return {
     amount,
     weeks,
     weekly_payment,
     description,
+    created: created.toISOString(),
   };
 };
 

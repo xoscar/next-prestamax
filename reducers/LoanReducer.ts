@@ -1,9 +1,9 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { keyBy } from 'lodash';
-import LoansClient from '../api/LoansAPI/LoansClient';
+import { addLoan, getLoan, loadNextPage, searchLoans, updateLoan } from '../actions/loanActions';
 import { LoadingState } from '../enums/common';
-import Loan, { FormDataLoanType } from '../records/Loan';
-import { AppState } from '../tools/configureStore';
+import Loan from '../records/Loan';
+import { addPayment, deletePayment, updatePayment } from './PaymentReducer';
 
 const DEFAULT_PAGE_SIZE = 20;
 
@@ -14,62 +14,6 @@ type LoanReducerInitialState = {
   hasMoreItems: boolean;
   pageNumber: number;
 };
-
-type SearchLoansParamsType = {
-  search: string;
-  clientId?: string;
-  finished: boolean;
-};
-
-export const searchLoans = createAsyncThunk<Array<Loan>, SearchLoansParamsType>(
-  'loans/searchLoans',
-  async ({ search, clientId, finished }) => {
-    const loanList = await LoansClient.get({
-      search,
-      pageNumber: 0,
-      pageSize: DEFAULT_PAGE_SIZE,
-      clientId,
-      finished,
-    });
-
-    return loanList;
-  },
-);
-
-export const loadNextPage = createAsyncThunk<Array<Loan>, SearchLoansParamsType>(
-  'loans/loadNextPage',
-  async ({ search = '', clientId, finished }, { getState }) => {
-    const { pageNumber } = (getState() as AppState).loans;
-
-    const loanList = await LoansClient.get({
-      search,
-      pageNumber,
-      pageSize: DEFAULT_PAGE_SIZE,
-      clientId,
-      finished,
-    });
-
-    return loanList;
-  },
-);
-
-export const addLoan = createAsyncThunk<Loan, { clientId: string; values: FormDataLoanType }>(
-  'loans/addLoan',
-  async ({ clientId, values }) => {
-    const loan = await LoansClient.create(clientId, values);
-
-    return loan;
-  },
-);
-
-export const updateLoan = createAsyncThunk<
-  Loan,
-  { clientId: string; loanId: string; values: FormDataLoanType }
->('loans/updateLoan', async ({ clientId, loanId, values }) => {
-  const loan = await LoansClient.update(clientId, loanId, values);
-
-  return loan;
-});
 
 const initialState: LoanReducerInitialState = {
   loan: undefined,
@@ -109,6 +53,12 @@ const { actions, reducer } = createSlice({
         state.pageNumber++;
         state.loadingState = LoadingState.SUCCESS;
       })
+      .addCase(getLoan.fulfilled, (state, action) => {
+        const { payload: loan } = action;
+
+        state.loan = loan;
+        state.loadingState = LoadingState.SUCCESS;
+      })
       .addCase(addLoan.fulfilled, (state, action) => {
         const { payload: loan } = action;
 
@@ -125,6 +75,21 @@ const { actions, reducer } = createSlice({
         state.loan = loan;
 
         state.loadingState = LoadingState.SUCCESS;
+      })
+      .addCase(addPayment.fulfilled, (state, action) => {
+        const { payload: payment } = action;
+
+        state.loan = state.loan?.addPayment(payment);
+      })
+      .addCase(updatePayment.fulfilled, (state, action) => {
+        const { payload: payment } = action;
+
+        state.loan = state.loan?.updatePayment(payment);
+      })
+      .addCase(deletePayment.fulfilled, (state, action) => {
+        const { payload: paymentId } = action;
+
+        state.loan = state.loan?.removePayment(paymentId);
       });
   },
 });

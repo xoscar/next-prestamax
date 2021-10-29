@@ -1,10 +1,11 @@
+import { differenceInDays } from 'date-fns';
 import { UserType } from '../../records/User';
 import User from '../../records/User';
 import LocalStorageClient from '../LocalStorageClient';
 
 export const USER_SESSION = 'user_session';
 
-const localStorageClient = LocalStorageClient<UserType>();
+const localStorageClient = LocalStorageClient<{ createdAt: number; user: UserType }>();
 
 export type SessionClient = {
   getSession(): User | undefined;
@@ -14,14 +15,16 @@ export type SessionClient = {
 
 const SessionClient: SessionClient = {
   getSession() {
-    const userSession = localStorageClient.get(USER_SESSION);
+    const { createdAt = Date.now(), user } = localStorageClient.get(USER_SESSION) || {};
 
-    if (userSession) return User.createFromRaw(userSession);
+    const diff = differenceInDays(new Date(createdAt), Date.now());
+
+    if (user && diff <= 7) return User.createFromRaw(user);
 
     return undefined;
   },
   saveSession(user) {
-    localStorageClient.set(USER_SESSION, user);
+    localStorageClient.set(USER_SESSION, { createdAt: Date.now(), user });
   },
   removeSession() {
     localStorageClient.del(USER_SESSION);

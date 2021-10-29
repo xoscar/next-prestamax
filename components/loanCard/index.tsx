@@ -1,7 +1,8 @@
+import { FunctionComponent } from 'react';
+import Link from 'next/link';
 import { Button, Card, CardActions, CardContent } from '@mui/material';
 import { formatRelative, isValid } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
-import { FunctionComponent } from 'react';
 import Loan from '../../records/Loan';
 import {
   CardWrapper,
@@ -18,8 +19,20 @@ export type LoanCardProps = {
 };
 
 const LoanCard: FunctionComponent<LoanCardProps> = ({
-  loan: { weeks, number_id, current_balance, paymentList, amount, created, expired_date, expired },
+  loan: {
+    weeks,
+    number_id,
+    current_balance,
+    paymentList,
+    amount,
+    created,
+    expired_date,
+    expired,
+    client,
+    id,
+  },
 }) => {
+  const { name, surname, client_id } = client;
   const createdAt = isValid(created) && formatRelative(created, new Date(), { locale: esLocale });
   const expiresAt =
     isValid(expired_date) && formatRelative(expired_date, new Date(), { locale: esLocale });
@@ -34,7 +47,13 @@ const LoanCard: FunctionComponent<LoanCardProps> = ({
             <ClientIdText>${amount}</ClientIdText>
           </DataEntry>
           <DataEntry>
-            <ClientNameText>{weeks} semanas</ClientNameText>
+            <ClientNameText>
+              {name} {surname}
+            </ClientNameText>
+          </DataEntry>
+          <DataEntry>
+            <DataEntryFieldText>Semanas</DataEntryFieldText>{' '}
+            <DataEntryFieldValue>{weeks}</DataEntryFieldValue>
           </DataEntry>
           <DataEntry>
             <DataEntryFieldText>Id</DataEntryFieldText>{' '}
@@ -62,7 +81,12 @@ const LoanCard: FunctionComponent<LoanCardProps> = ({
           </DataEntry>
         </CardContent>
         <CardActions>
-          <Button size="small">Ver Más</Button>
+          <Link href={`/clients/${client_id}/loans/${id}`} passHref>
+            <Button size="small">Ver Más</Button>
+          </Link>
+          <Link href={`/clients/${client_id}`} passHref>
+            <Button size="small">Ver Cliente</Button>
+          </Link>
         </CardActions>
       </Card>
     </CardWrapper>

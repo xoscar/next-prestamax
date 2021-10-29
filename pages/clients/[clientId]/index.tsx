@@ -16,7 +16,7 @@ import {
 } from '../../../styles/pages/clientDetailsStyled';
 import ClientDetails from '../../../components/clientDetails';
 import ClientDetailsTabs from '../../../components/clientDetailsTabs';
-import { addLoan, loadNextPage, searchLoans } from '../../../reducers/LoanReducer';
+import { addLoan, loadNextPage, searchLoans } from '../../../actions/loanActions';
 import {
   addCharge,
   loadCharges,

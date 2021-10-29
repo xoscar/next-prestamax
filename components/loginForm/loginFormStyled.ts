@@ -1,17 +1,18 @@
-import { Button, FormControl } from '@mui/material';
-import { Box } from '@mui/system';
+import { Button, FormControl, Grid } from '@mui/material';
 import styled from 'styled-components';
 
-export const Container = styled(Box)`
-  width: 100%;
-  padding: 24px;
+export const Container = styled(Grid).attrs({
+  container: true,
+})`
+  padding: 16px;
 `;
 
 export const FormSection = styled(FormControl).attrs({
   variant: 'standard',
 })`
   && {
-    margin-bottom: 25px;
+    width: 100%;
+    margin-bottom: 34px;
   }
 `;
 

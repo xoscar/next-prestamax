@@ -5,6 +5,7 @@ import { InputAdornment, TextField } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import LockIcon from '@mui/icons-material/Lock';
 import { Container, FormSection, LoginButton } from './loginFormStyled';
+import { ActionsContainer } from '../loanForm/loanFormStyled';
 
 export type LoginFormProps = {
   onSubmit(values: LoginValues): void;
@@ -61,8 +62,9 @@ const LoginForm: FunctionComponent<LoginFormProps> = ({ onSubmit }) => {
                 value={values.password}
               />
             </FormSection>
-
-            <LoginButton onClick={() => submitForm()}>Login</LoginButton>
+            <ActionsContainer>
+              <LoginButton onClick={() => submitForm()}>Login</LoginButton>
+            </ActionsContainer>
           </Container>
         );
       }}

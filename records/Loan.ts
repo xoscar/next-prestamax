@@ -1,5 +1,6 @@
 import { Record } from 'immutable';
 import Client, { RawClientType } from './Client';
+import Payment, { RawPaymentType } from './Payment';
 
 export type RawLoanType = {
   id: string;
@@ -19,7 +20,7 @@ export type RawLoanType = {
   current_week: number;
   current_balance: number;
   last_payment: string;
-  payments: Array<string>;
+  payments: Array<RawPaymentType>;
   client: RawClientType;
 };
 
@@ -41,7 +42,7 @@ export type LoanType = {
   current_week: number;
   current_balance: number;
   last_payment: Date;
-  paymentList: Array<string>;
+  paymentList: Array<Payment>;
   client: Client;
 };
 
@@ -72,6 +73,7 @@ export type FormDataLoanType = {
   weekly_payment: number;
   weeks: number;
   description: string;
+  created: string;
 };
 
 class Loan extends Record<LoanType>(defaultValues) {
@@ -81,7 +83,7 @@ class Loan extends Record<LoanType>(defaultValues) {
 
     return new this({
       ...rawLoan,
-      paymentList: payments,
+      paymentList: payments.map((rawPayment) => Payment.createFromRaw(rawPayment)),
       created: new Date(created),
       updated: new Date(updated),
       finished_date: new Date(finished_date),
@@ -89,6 +91,41 @@ class Loan extends Record<LoanType>(defaultValues) {
       last_payment: new Date(last_payment),
       client: Client.createFromRawSearch(client),
     });
+  }
+
+  addPayment(payment: Payment): Loan {
+    const { paymentList } = this;
+    const newPaymentList = [payment, ...paymentList];
+
+    return this.applyPaymentList(newPaymentList);
+  }
+
+  updatePayment(payment: Payment): Loan {
+    const { paymentList } = this;
+    const newPaymentList = paymentList.filter(({ id }) => id !== payment.id).concat([payment]);
+
+    return this.applyPaymentList(newPaymentList);
+  }
+
+  removePayment(paymentId: string): Loan {
+    const { paymentList } = this;
+    const newPaymentList = paymentList.filter(({ id }) => id !== paymentId);
+
+    return this.applyPaymentList(newPaymentList);
+  }
+
+  applyPaymentList(paymentList: Array<Payment>): Loan {
+    const currentBalance = Loan.currentBalance(this.amount, paymentList);
+
+    return this.merge({
+      paymentList: paymentList,
+      finished: !currentBalance,
+      current_balance: currentBalance,
+    });
+  }
+
+  static currentBalance(amount: number, paymentList: Array<Payment>): number {
+    return paymentList.reduce((total, { amount }) => total - amount, amount);
   }
 }
 

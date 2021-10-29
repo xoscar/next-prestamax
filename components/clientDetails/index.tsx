@@ -1,7 +1,7 @@
 import { Divider, List, ListItem } from '@mui/material';
 import { formatRelative, isValid } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
-import { FunctionComponent, useCallback, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import Client from '../../records/Client';
 import ConfirmationModal from '../confirmationModal';
 import {
