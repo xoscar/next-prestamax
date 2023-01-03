@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type LoansPayments {
+  id      String   @map("_id") @db.ObjectId
+  amount  Int
+  created DateTime @db.Date
+}
+
+model Charge {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  v              Int       @map("__v")
+  amount         Int
+  clientId       String    @map("client_id") @db.ObjectId
+  created        DateTime  @db.Date
+  description    String
+  expirationDate DateTime? @map("expiration_date") @db.Date
+  paid           Boolean
+  paidDate       DateTime? @map("paid_date") @db.Date
+  userId         String    @map("user_id") @db.ObjectId
+  weeks          Int?
+  client         Client    @relation(fields: [clientId], references: [id])
+
+  @@index([created(sort: Desc)], map: "created_-1")
+  @@index([clientId], map: "client_id_1")
+  @@index([created(sort: Desc), userId], map: "created_-1_user_id_1")
+  @@map("charges")
+}
+
+model Client {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  v        Int?     @map("__v")
+  address  String
+  clientId String   @map("client_id")
+  created  DateTime @db.Date
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  id_      Json?    @map("id")
+  name     String
+  phone    String
+  search   String[]
+  surname  String
+  updated  DateTime @updatedAt @db.Date
+  /// Multiple data types found: String: 0.2%, String (ObjectId): 99.8% out of 515 sampled entries
+  userId   String   @default("") @map("user_id") @db.ObjectId
+  loans    Loan[]
+  charges  Charge[]
+
+  @@index([created(sort: Desc)], map: "created_-1")
+  @@index([created(sort: Desc), userId], map: "created_-1_user_id_1")
+  @@index([search], map: "search_1")
+  @@map("clients")
+}
+
+model Counter {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  v     Int    @map("__v")
+  count Int
+  name  String
+
+  @@map("counters")
+}
+
+model Loan {
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  v                Int             @map("__v")
+  amount           Int
+  clientId         String          @map("client_id") @db.ObjectId
+  clientIdentifier String?         @map("client_identifier")
+  clientName       String          @map("client_name")
+  created          DateTime        @db.Date
+  description      String?
+  expiredDate      DateTime        @map("expired_date") @db.Date
+  file             String?
+  finished         Boolean
+  finishedDate     DateTime?       @map("finished_date") @db.Date
+  numberId         Int             @map("number_id")
+  payments         LoansPayments[]
+  search           String[]
+  updated          DateTime        @updatedAt @db.Date
+  userId           String          @map("user_id") @db.ObjectId
+  visible          Boolean
+  weeklyPayment    Int             @map("weekly_payment")
+  weeks            Int
+  client           Client          @relation(fields: [clientId], references: [id])
+
+  @@index([created(sort: Desc)], map: "created_-1")
+  @@index([clientId(sort: Desc)], map: "client_id_-1")
+  @@index([created(sort: Desc), userId], map: "created_-1_user_id_1")
+  @@index([search], map: "search_1")
+  @@map("loans")
+}
+
+model Session {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  expires Json?
+
+  @@index([expires], map: "expires_1")
+  @@map("sessions")
+}
+
+model User {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  v        Int    @map("__v")
+  password String
+  role     String
+  token    String
+  username String
+
+  @@map("users")
+}
