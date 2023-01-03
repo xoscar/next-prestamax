@@ -1,4 +1,4 @@
-import { PublicRouteList, Routes } from '../enums/common';
+import { PublicRouteList, Routes } from '../constants/Common.constants';
 
 export const getIsPublicPath = (url: string): boolean => {
   const [path] = url.split('?');

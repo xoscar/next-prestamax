@@ -1,22 +1,23 @@
 import { flow } from 'lodash';
 import type { NextApiResponse } from 'next';
-import { ISerializedCharge } from '../../../../database/interfaces/ICharge';
-import { AuthorizedNextApiRequest } from '../../../../database/interfaces/ICommon';
-import ChargeService from '../../../../database/services/ChargeService';
-import ClientService from '../../../../database/services/ClientService';
-import { HttpMethods } from '../../../../enums/http';
-import withApiErrorHandler from '../../../../middlewares/errorHandler';
-import withJWTMiddleware from '../../../../middlewares/jwt';
+import ChargeService from '../../../../server/repositories/Charge.repository';
+import ClientService from '../../../../server/repositories/Client.repository';
+import { HttpMethods } from '../../../../constants/Http.constants';
+import withApiErrorHandler from '../../../../server/middlewares/ErrorHandler.midleware';
+import withJWTMiddleware from '../../../../server/middlewares/JWT.middleware';
+import { AuthorizedNextApiRequest } from '../../../../server/types/Common.types';
+import Charge from '../../../../models/Charge.model';
 
 const handler = async (
   req: AuthorizedNextApiRequest,
-  res: NextApiResponse<ISerializedCharge | Array<ISerializedCharge>>,
+  res: NextApiResponse<Charge | Charge[]>,
 ): Promise<void> => {
+  const {
+    payload: { id },
+  } = req.auth;
+
   switch (req.method) {
     case HttpMethods.GET: {
-      const {
-        payload: { id },
-      } = req.user;
       const { clientId, paid } = req.query;
       const client = await ClientService.getClient(id?.toString() as string, clientId as string);
       const charges = await ChargeService.getCharges({
@@ -24,18 +25,15 @@ const handler = async (
         clientId: client.id?.toString() as string,
       });
 
-      return res.status(200).json(charges.map((charge) => charge.serialize()));
+      return res.status(200).json(charges);
     }
 
     case HttpMethods.POST: {
-      const {
-        payload: { id },
-      } = req.user;
       const { clientId } = req.query;
       const client = await ClientService.getClient(id?.toString() as string, clientId as string);
       const charge = await ChargeService.createCharge(client, req.body);
 
-      return res.status(200).json(charge.serialize());
+      return res.status(200).json(charge);
     }
 
     default: {

@@ -1,50 +1,43 @@
 import { flow } from 'lodash';
 import type { NextApiResponse } from 'next';
-import { ISerializedClient } from '../../../../database/interfaces/IClient';
-import { AuthorizedNextApiRequest } from '../../../../database/interfaces/ICommon';
-import ClientService from '../../../../database/services/ClientService';
-import ClientViewModel, { ClientResult } from '../../../../database/viewModel/ClientViewModel';
-import { HttpMethods } from '../../../../enums/http';
-import withApiErrorHandler from '../../../../middlewares/errorHandler';
-import withJWTMiddleware from '../../../../middlewares/jwt';
+import ClientRepository from '../../../../server/repositories/Client.repository';
+import { HttpMethods } from '../../../../constants/Http.constants';
+import withApiErrorHandler from '../../../../server/middlewares/ErrorHandler.midleware';
+import withJWTMiddleware from '../../../../server/middlewares/JWT.middleware';
+import { AuthorizedNextApiRequest } from '../../../../server/types/Common.types';
+import Client from '../../../../models/Client.model';
 
 const handler = async (
   req: AuthorizedNextApiRequest,
-  res: NextApiResponse<ISerializedClient | Array<ISerializedClient> | ClientResult>,
+  res: NextApiResponse<Client>,
 ): Promise<void> => {
+  const {
+    payload: { id },
+  } = req.auth;
+
   switch (req.method) {
     case HttpMethods.GET: {
-      const {
-        payload: { id },
-      } = req.user;
       const { clientId } = req.query;
-      const client = await ClientService.getClient(id?.toString() as string, clientId as string);
-      const stats = await ClientViewModel.getStatsForClient(client);
+      const client = await ClientRepository.getClient(id?.toString() as string, clientId as string);
 
-      return res.status(200).json({ ...client.serialize(), stats });
+      return res.status(200).json(client);
     }
 
     case HttpMethods.PUT: {
-      const {
-        payload: { id },
-      } = req.user;
       const { clientId } = req.query;
-      const client = await ClientService.updateClient(
+      const client = await ClientRepository.updateClient(
         id?.toString() as string,
         clientId as string,
         req.body,
       );
 
-      return res.status(200).json(client.serialize());
+      return res.status(200).json(client);
     }
 
     case HttpMethods.DELETE: {
-      const {
-        payload: { id },
-      } = req.user;
       const { clientId } = req.query;
-      await ClientService.getClient(id?.toString() as string, clientId as string);
-      await ClientService.deleteClient(id?.toString() as string, clientId as string);
+      await ClientRepository.getClient(id?.toString() as string, clientId as string);
+      await ClientRepository.deleteClient(id?.toString() as string, clientId as string);
 
       return res.status(204).end();
     }

@@ -1,21 +1,23 @@
 import { flow } from 'lodash';
 import type { NextApiResponse } from 'next';
-import { AuthorizedNextApiRequest } from '../../../../../../../../database/interfaces/ICommon';
-import { HttpMethods } from '../../../../../../../../enums/http';
-import withApiErrorHandler from '../../../../../../../../middlewares/errorHandler';
-import withJWTMiddleware from '../../../../../../../../middlewares/jwt';
-import PaymentService from '../../../../../../../../database/services/PaymentService';
-import { ISerializedPayment } from '../../../../../../../../database/interfaces/IPayment';
+import { HttpMethods } from '../../../../../../../../constants/Http.constants';
+import withApiErrorHandler from '../../../../../../../../server/middlewares/ErrorHandler.midleware';
+import withJWTMiddleware from '../../../../../../../../server/middlewares/JWT.middleware';
+import Payment from '../../../../../../../../models/Payment.model';
+import ClientRepository from '../../../../../../../../server/repositories/Client.repository';
+import PaymentService from '../../../../../../../../server/repositories/Payment.repository';
+import { AuthorizedNextApiRequest } from '../../../../../../../../server/types/Common.types';
 
 const handler = async (
   req: AuthorizedNextApiRequest,
-  res: NextApiResponse<ISerializedPayment | Array<ISerializedPayment>>,
+  res: NextApiResponse<Payment>,
 ): Promise<void> => {
+  const {
+    payload: { id },
+  } = req.auth;
+
   switch (req.method) {
     case HttpMethods.GET: {
-      const {
-        payload: { id },
-      } = req.user;
       const { loanId, paymentId } = req.query;
       const payment = await PaymentService.getPayment(
         id?.toString() as string,
@@ -23,34 +25,26 @@ const handler = async (
         paymentId as string,
       );
 
-      return res.status(200).json(payment.serialize());
+      return res.status(200).json(payment);
     }
 
     case HttpMethods.PUT: {
-      const {
-        payload: { id },
-      } = req.user;
-      const { loanId, paymentId } = req.query;
+      const { loanId, paymentId, clientId } = req.query;
+      const client = await ClientRepository.getClient(id?.toString() as string, clientId as string);
       const payment = await PaymentService.updatePayment(
-        id?.toString() as string,
+        client,
         loanId as string,
         paymentId as string,
         req.body,
       );
 
-      return res.status(200).json(payment.serialize());
+      return res.status(200).json(payment);
     }
 
     case HttpMethods.DELETE: {
-      const {
-        payload: { id },
-      } = req.user;
-      const { paymentId, loanId } = req.query;
-      await PaymentService.deletePayment(
-        id?.toString() as string,
-        loanId as string,
-        paymentId as string,
-      );
+      const { paymentId, loanId, clientId } = req.query;
+      const client = await ClientRepository.getClient(id?.toString() as string, clientId as string);
+      await PaymentService.deletePayment(client, loanId as string, paymentId as string);
 
       return res.status(204).end();
     }

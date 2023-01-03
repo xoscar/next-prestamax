@@ -1,28 +1,27 @@
 import { flow } from 'lodash';
 import type { NextApiResponse } from 'next';
-import { AuthorizedNextApiRequest } from '../../../../database/interfaces/ICommon';
-import { ISerializedLoan } from '../../../../database/interfaces/ILoan';
-import ClientService from '../../../../database/services/ClientService';
-import LoanService from '../../../../database/services/LoanService';
-import { LoanResult } from '../../../../database/viewModel/LoanViewModel';
-import { HttpMethods } from '../../../../enums/http';
-import withApiErrorHandler from '../../../../middlewares/errorHandler';
-import withJWTMiddleware from '../../../../middlewares/jwt';
+import ClientService from '../../../../server/repositories/Client.repository';
+import LoanService from '../../../../server/repositories/Loan.repository';
+import { HttpMethods } from '../../../../constants/Http.constants';
+import withApiErrorHandler from '../../../../server/middlewares/ErrorHandler.midleware';
+import withJWTMiddleware from '../../../../server/middlewares/JWT.middleware';
+import { AuthorizedNextApiRequest } from '../../../../server/types/Common.types';
+import Loan from '../../../../models/Loan.model';
 
 const handler = async (
   req: AuthorizedNextApiRequest,
-  res: NextApiResponse<ISerializedLoan | Array<ISerializedLoan> | LoanResult>,
+  res: NextApiResponse<Loan>,
 ): Promise<void> => {
   switch (req.method) {
     case HttpMethods.POST: {
       const {
         payload: { id },
-      } = req.user;
+      } = req.auth;
       const { clientId } = req.query;
       const client = await ClientService.getClient(id?.toString() as string, clientId as string);
       const loan = await LoanService.createLoan(client, req.body);
 
-      return res.status(200).json({ ...loan.serialize(), client: client.serialize() });
+      return res.status(200).json(loan);
     }
 
     default: {

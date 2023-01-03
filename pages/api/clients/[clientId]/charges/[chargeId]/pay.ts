@@ -1,27 +1,27 @@
 import { flow } from 'lodash';
 import type { NextApiResponse } from 'next';
-import { ISerializedCharge } from '../../../../../../database/interfaces/ICharge';
-import { AuthorizedNextApiRequest } from '../../../../../../database/interfaces/ICommon';
-import ChargeService from '../../../../../../database/services/ChargeService';
-import ClientService from '../../../../../../database/services/ClientService';
-import { HttpMethods } from '../../../../../../enums/http';
-import withApiErrorHandler from '../../../../../../middlewares/errorHandler';
-import withJWTMiddleware from '../../../../../../middlewares/jwt';
+import ChargeRepository from '../../../../../../server/repositories/Charge.repository';
+import ClientRepository from '../../../../../../server/repositories/Client.repository';
+import { HttpMethods } from '../../../../../../constants/Http.constants';
+import withApiErrorHandler from '../../../../../../server/middlewares/ErrorHandler.midleware';
+import withJWTMiddleware from '../../../../../../server/middlewares/JWT.middleware';
+import { AuthorizedNextApiRequest } from '../../../../../../server/types/Common.types';
+import Charge from '../../../../../../models/Charge.model';
 
 const handler = async (
   req: AuthorizedNextApiRequest,
-  res: NextApiResponse<ISerializedCharge | Array<ISerializedCharge>>,
+  res: NextApiResponse<Charge>,
 ): Promise<void> => {
   switch (req.method) {
     case HttpMethods.POST: {
       const {
         payload: { id },
-      } = req.user;
+      } = req.auth;
       const { clientId, chargeId } = req.query;
-      const client = await ClientService.getClient(id?.toString() as string, clientId as string);
-      const charge = await ChargeService.payCharge(client, chargeId as string);
+      await ClientRepository.getClient(id?.toString() as string, clientId as string);
+      const charge = await ChargeRepository.payCharge(chargeId as string);
 
-      return res.status(200).json(charge.serialize());
+      return res.status(200).json(charge);
     }
 
     default: {

@@ -1,16 +1,15 @@
 import { flow } from 'lodash';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import UserService, { ILoginUserResponse } from '../../database/services/UserService';
-import { HttpMethods } from '../../enums/http';
-import withApiErrorHandler from '../../middlewares/errorHandler';
+import LoginService from '../../server/services/Login.service';
+import { HttpMethods } from '../../constants/Http.constants';
+import withApiErrorHandler from '../../server/middlewares/ErrorHandler.midleware';
+import User from '../../models/User.model';
 
-const handler = async (
-  req: NextApiRequest,
-  res: NextApiResponse<ILoginUserResponse>,
-): Promise<void> => {
+const handler = async (req: NextApiRequest, res: NextApiResponse<User>): Promise<void> => {
   switch (req.method) {
     case HttpMethods.POST: {
-      const user = await UserService.login(req.body);
+      const { username = '', password = '' } = req.body;
+      const user = await LoginService.login(username, password);
 
       return res.status(200).json(user);
     }
