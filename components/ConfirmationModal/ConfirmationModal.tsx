@@ -1,9 +1,8 @@
 import { Button, Modal } from '@mui/material';
-import { FunctionComponent } from 'react';
 import { ActionsContainer } from '../ClientForm/ClientForm.styled';
 import { ConfirmButton, ModalContent, ModalTitle, Message } from './ConfirmationModal.styled';
 
-export type ClientModalProps = {
+interface IProps {
   title: string;
   message: string;
   cancelText?: string;
@@ -11,9 +10,9 @@ export type ClientModalProps = {
   isOpen: boolean;
   onClose(): void;
   onConfirm(): void;
-};
+}
 
-const ConfirmationModal: FunctionComponent<ClientModalProps> = ({
+const ConfirmationModal = ({
   isOpen,
   onClose,
   onConfirm,
@@ -21,7 +20,7 @@ const ConfirmationModal: FunctionComponent<ClientModalProps> = ({
   message,
   cancelText = 'Cancelar',
   confirmText,
-}) => {
+}: IProps) => {
   return (
     <Modal
       open={isOpen}

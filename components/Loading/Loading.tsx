@@ -1,8 +1,7 @@
 import { LinearProgress } from '@mui/material';
-import { FunctionComponent } from 'react';
 import { Container, Text, Wrapper, LoadingContainer } from './Loading.styled';
 
-const Loading: FunctionComponent = () => {
+const Loading = () => {
   return (
     <Wrapper>
       <LoadingContainer>

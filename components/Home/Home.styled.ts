@@ -32,6 +32,7 @@ export const AddClientButton = styled(Button).attrs({
 export const CardContainer = styled(Grid).attrs({
   container: true,
   xs: 12,
+  lg: 6,
 })`
   gap: 12px;
   align-items: start;

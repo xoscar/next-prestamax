@@ -1,14 +1,14 @@
-import { FunctionComponent, ReactElement } from 'react';
+import { ReactElement } from 'react';
 import { useRouter } from 'next/router';
 import { getIsPublicPath } from '../utils/router';
 import Navigation from '../components/Navigation';
 import { GlobalStyles } from '../styles/Global.styled';
 
-export type LayoutProps = {
+interface IProps {
   children: ReactElement;
-};
+}
 
-const Layout: FunctionComponent<LayoutProps> = ({ children }) => {
+const Layout = ({ children }: IProps) => {
   const router = useRouter();
   const shouldDisplayNav = !getIsPublicPath(router.asPath);
 

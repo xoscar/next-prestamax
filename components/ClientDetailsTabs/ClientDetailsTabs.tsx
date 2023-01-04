@@ -1,4 +1,4 @@
-import { FunctionComponent, SyntheticEvent, useCallback, useState } from 'react';
+import { SyntheticEvent, useCallback, useState } from 'react';
 import { Tab, Tabs } from '@mui/material';
 import TabPanel from '../TabPanel';
 import { TabsContainer } from './ClientDetailsTabs.styled';
@@ -8,22 +8,16 @@ import LoanProvider from '../../providers/Loan';
 import Charges from './Tabs/Charges';
 import ChargeProvider from '../../providers/Charge';
 
-export type ClientDetailsTabsProps = {
+interface IProps {
   client: Client;
-  showFinished: boolean;
-  onFinishedChange(isChecked: boolean): void;
-  onLoansNextPage(): void;
-  onChargesNextPage(): void;
-  onAddLoan(values: any): void;
-  onAddCharge(values: any): void;
-};
+}
 
 const getA11yProps = (index: number) => ({
   id: `tab-${index}`,
   'aria-controls': `tabpanel-${index}`,
 });
 
-const ClientDetailsTabs: FunctionComponent<ClientDetailsTabsProps> = ({ client }) => {
+const ClientDetailsTabs = ({ client }: IProps) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
   const handleChange = useCallback((event: SyntheticEvent, newValue: number) => {

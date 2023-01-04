@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Divider, List, ListItem } from '@mui/material';
 import { formatRelative } from 'date-fns';
@@ -14,12 +14,12 @@ import {
 } from './LoanDetails.styled';
 import Loan from '../../models/Loan.model';
 
-export type LoanDetailsProps = {
+interface IProps {
   loan: Loan;
   onDelete(): void;
-};
+}
 
-const LoanSummary: FunctionComponent<LoanDetailsProps> = ({
+const LoanSummary = ({
   loan: {
     numberId,
     lastPayment,
@@ -29,7 +29,7 @@ const LoanSummary: FunctionComponent<LoanDetailsProps> = ({
   },
   loan,
   onDelete,
-}) => {
+}: IProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const lastPaymentAt =

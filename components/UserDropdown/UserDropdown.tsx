@@ -1,13 +1,13 @@
-import { FunctionComponent, MouseEvent, useCallback, useState } from 'react';
+import { MouseEvent, useCallback, useState } from 'react';
 import { Menu, MenuItem } from '@mui/material';
 import { UserLink } from './UserDropdown.styled';
 import { useUser } from '../../providers/User/User.provider';
 
-export type UserDropdownProps = {
+interface IProps {
   isDesktop?: boolean;
-};
+}
 
-const UserDropdown: FunctionComponent<UserDropdownProps> = ({ isDesktop }) => {
+const UserDropdown = ({ isDesktop }: IProps) => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const { user, onLogout } = useUser();
   const isOpen = !!anchorEl;

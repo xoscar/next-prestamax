@@ -23,15 +23,7 @@ const ClientDetails = () => {
         </FormContainer>
         <ClientSummary client={client} onDelete={() => onDelete(id)} />
         <TabsContainer>
-          <ClientDetailsTabs
-            client={client}
-            showFinished={false}
-            onFinishedChange={console.log}
-            onLoansNextPage={console.log}
-            onChargesNextPage={console.log}
-            onAddLoan={console.log}
-            onAddCharge={console.log}
-          />
+          <ClientDetailsTabs client={client} />
         </TabsContainer>
       </DetailsContainer>
     </PageContainer>

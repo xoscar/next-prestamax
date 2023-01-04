@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import { useState } from 'react';
 import { noop } from 'lodash';
 import { Button, TextField } from '@mui/material';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
@@ -7,13 +7,13 @@ import useClientForm from './hooks/useClientForm';
 import { ActionsContainer, Container, FormSection, SubmitButton } from './ClientForm.styled';
 import Client, { TPartialClient } from '../../models/Client.model';
 
-export type ClientFormProps = {
+interface IProps {
   client?: Client;
   onSubmit(values: TPartialClient): void;
   onCancel?(): void;
-};
+}
 
-const ClientForm: FunctionComponent<ClientFormProps> = ({ client, onSubmit, onCancel = noop }) => {
+const ClientForm = ({ client, onSubmit, onCancel = noop }: IProps) => {
   const { handleSubmit, errors, values, handleChange } = useClientForm({
     onSubmit,
     client,

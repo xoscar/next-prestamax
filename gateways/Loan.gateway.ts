@@ -5,14 +5,14 @@ const { post, put, getOne, remove } = AuthenticatedClient<TPartialLoan, TPartial
   '/api/clients/{{clientId}}/loans',
 );
 
-type LoansClientType = {
+type TLoansGateway = {
   getOne(props: { clientId: string; loanId: string }): Promise<Loan>;
   create(props: { clientId: string; values: TPartialLoan }): Promise<Loan>;
   update(props: { clientId: string; loanId: string; values: TPartialLoan }): Promise<Loan>;
   remove(props: { clientId: string; loanId: string }): Promise<void>;
 };
 
-const LoanGateway: LoansClientType = {
+const LoanGateway: TLoansGateway = {
   async getOne({ clientId, loanId }) {
     const { json: rawLoan } = await getOne({
       pathParameters: { clientId },

@@ -1,4 +1,3 @@
-import { FunctionComponent } from 'react';
 import { InputAdornment, TextField } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import LockIcon from '@mui/icons-material/Lock';
@@ -6,11 +5,11 @@ import { Container, FormSection, LoginButton } from './LoginForm.styled';
 import { ActionsContainer } from '../LoanForm/LoanForm.styled';
 import useLoginForm, { TLoginValues } from './hooks/useLoginForm';
 
-export type LoginFormProps = {
+interface IProps {
   onSubmit(values: TLoginValues): void;
-};
+}
 
-const LoginForm: FunctionComponent<LoginFormProps> = ({ onSubmit }) => {
+const LoginForm = ({ onSubmit }: IProps) => {
   const { handleSubmit, errors, values, handleChange } = useLoginForm({ onSubmit });
 
   return (

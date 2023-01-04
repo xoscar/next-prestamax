@@ -16,14 +16,8 @@ const SearchService = () => ({
     userId: string,
     { take = '', skip = '', search = '', type = SearchableRepos.CLIENT }: NextApiRequestQuery,
   ): TSearchQuery {
-    const pageOkay = isInt(take as string, {
-      min: 0,
-      max: 99,
-    });
-    const pageSizeOkay = isInt(skip as string, {
-      min: 0,
-      max: 48,
-    });
+    const pageOkay = isInt(take as string);
+    const pageSizeOkay = isInt(skip as string);
 
     return {
       take: pageOkay ? +take : 20,
