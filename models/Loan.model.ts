@@ -52,8 +52,6 @@ const Loan = ({
   );
   const isExpired = isAfter(Date.now(), new Date(expiredDate)) && !finished;
 
-  console.log('@@@>', finished);
-
   const status =
     (isExpired && LoanStatus.EXPIRED) || (finished && LoanStatus.FINISHED) || LoanStatus.ACTIVE;
 
