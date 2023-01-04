@@ -19,12 +19,12 @@ const MobileNavigation = ({ isOpen, onClose }: IProps) => {
     <MobileDrawer open={isOpen} onClose={onClose}>
       <OptionsContainer>
         <NavHeadingItem>
-          <OptionLink href="/home">
+          <OptionLink href="/">
             <NavHeading>PrestaMax</NavHeading>
           </OptionLink>
         </NavHeadingItem>
         <ListItem>
-          <OptionLink href="/home">
+          <OptionLink href="/">
             <OptionText>Clientes</OptionText>
           </OptionLink>
         </ListItem>
